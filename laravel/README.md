@@ -1,20 +1,41 @@
-# GECO Africa website
+# GECO Africa website and CMS
 
-The Laravel application lives in this directory so the existing PHP site at the repository root remains available during the rebuild.
+The Laravel website and its English CMS live in this folder. The earlier PHP site at the repository root remains separate. CMS content is stored in the `geco_cms` MySQL/MariaDB database and is seeded from Laravel's existing content catalogs; public URLs stay unchanged.
 
-## Run locally
+## Run locally with XAMPP
 
-```powershell
-php artisan serve
-```
+1. Start Apache and MySQL from the XAMPP control panel.
+2. Make sure the `geco_cms` database exists in MySQL. For a fresh local setup, copy `.env.example` to `.env`, set the local database credentials, then run `php artisan key:generate` once.
+3. From this folder, prepare and seed the CMS:
 
-The homepage is served at `http://127.0.0.1:8000/`. Its Blade view uses the styles and small navigation script in `public/`; no frontend build step is needed for the current page.
+   ```powershell
+   php artisan migrate --force
+   php artisan db:seed --force
+   php artisan storage:link
+   ```
 
-## Current page structure
+4. Create the first CMS administrator. The command asks for the person's name, email, and password without displaying the password:
 
-- `app/Http/Controllers/HomeController.php` supplies homepage content.
-- `resources/views/layouts/site.blade.php` provides shared navigation, footer and search metadata.
-- `resources/views/home.blade.php` contains the homepage sections.
-- `public/css/site.css` and `public/js/site.js` hold the responsive presentation and menu behavior.
+   ```powershell
+   php artisan cms:user:create
+   ```
 
-The homepage content is currently seeded in the controller. As the CMS and database are built, that content can move to managed records without changing the page structure.
+   The first administrator can add or deactivate other users from **Admin → Users**. All active CMS users have the same access.
+
+5. Start the Laravel site:
+
+   ```powershell
+   php artisan serve
+   ```
+
+   Website: `http://127.0.0.1:8000/`  
+   CMS: `http://127.0.0.1:8000/admin/login`
+
+## What the CMS manages
+
+- English page content and search metadata for all current public pages; future translations have locale-specific storage.
+- Services, project groups and references, featured projects, team, partners, gallery items and categories, blog posts and categories, and activities.
+- Homepage section visibility and display order.
+- A reusable media library, site contact settings, contact enquiries, user accounts, audit history, version restore, and recoverable Trash.
+
+Content changes are saved as drafts and become public only when published. Uploaded files use Laravel's public storage disk; keep the `public/storage` link in place so their URLs work.

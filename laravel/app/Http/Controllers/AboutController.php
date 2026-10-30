@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\ServicesCatalog;
-use App\Data\TeamCatalog;
+use App\Support\CmsContentRepository;
+
 use Illuminate\View\View;
 
 class AboutController extends Controller
@@ -37,7 +37,7 @@ class AboutController extends Controller
                     ],
                 ],
             ],
-            'serviceScopes' => ServicesCatalog::all(),
+            'serviceScopes' => CmsContentRepository::services(),
             'projects' => [
                 'Bugesera International Airport',
                 'Kigali City Tower',
@@ -48,7 +48,7 @@ class AboutController extends Controller
                 'Eastern Province Administrative Building',
                 'Kigali and Gisenyi Marine bases',
             ],
-            'team' => TeamCatalog::core(),
+            'team' => CmsContentRepository::coreTeam(),
         ]);
     }
 }

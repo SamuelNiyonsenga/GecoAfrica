@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\ServicesCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class ServicesController extends Controller
 {
     public function index(): View
     {
-        $services = ServicesCatalog::all();
+        $services = CmsContentRepository::services();
 
         return view('services', [
             'pageTitle' => 'Civil & Geotechnical Engineering Services in Rwanda | GECO Africa',

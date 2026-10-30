@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\TeamCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class TeamController extends Controller
 {
     public function index(): View
     {
-        $coreTeam = TeamCatalog::core();
-        $supportingTeam = TeamCatalog::supporting();
+        $coreTeam = CmsContentRepository::coreTeam();
+        $supportingTeam = CmsContentRepository::supportingTeam();
         $teamMembers = array_merge($coreTeam, $supportingTeam);
 
         return view('team', [

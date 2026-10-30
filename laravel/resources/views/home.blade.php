@@ -2,7 +2,7 @@
 
 @section('content')
 <main id="main-content">
-    <section class="home-showcase" data-home-carousel data-interval="7500" aria-label="GECO Africa projects and engineering services" aria-roledescription="carousel">
+    <section class="home-showcase" data-cms-section="hero" @if (!($homeSections['hero']['visible'] ?? true)) hidden @endif data-home-carousel data-interval="7500" aria-label="GECO Africa projects and engineering services" aria-roledescription="carousel">
         <div class="home-showcase-track" data-home-track>
             @foreach ($heroSlides as $slide)
                 <article class="home-showcase-slide @if ($loop->first) is-active @endif" data-home-slide aria-roledescription="slide" aria-label="Slide {{ $loop->iteration }} of {{ count($heroSlides) }}" aria-hidden="{{ $loop->first ? 'false' : 'true' }}" @if (!$loop->first) inert @endif>
@@ -45,7 +45,7 @@
         <a class="home-showcase-scroll" href="#home-at-a-glance"><span>Scroll to explore</span><i aria-hidden="true"></i></a>
     </section>
 
-    <section class="home-facts-strip" id="home-at-a-glance" aria-label="GECO Africa at a glance">
+    <section class="home-facts-strip" data-cms-section="facts" @if (!($homeSections['facts']['visible'] ?? true)) hidden @endif id="home-at-a-glance" aria-label="GECO Africa at a glance">
         <div class="site-container home-facts-grid">
             <div><strong>2007</strong><span>Engineering practice<br>founded in Rwanda</span></div>
             <div><strong>2009</strong><span>Registered as<br>GECO Africa Ltd</span></div>
@@ -54,7 +54,7 @@
         </div>
     </section>
 
-    <section class="section services-section" id="services">
+    <section class="section services-section" data-cms-section="services" @if (!($homeSections['services']['visible'] ?? true)) hidden @endif id="services">
         <div class="site-container">
             <div class="section-heading services-heading">
                 <div>
@@ -82,7 +82,7 @@
         </div>
     </section>
 
-    <section class="section home-projects-section" id="home-projects">
+    <section class="section home-projects-section" data-cms-section="projects" @if (!($homeSections['projects']['visible'] ?? true)) hidden @endif id="home-projects">
         <div class="site-container">
             <div class="section-heading">
                 <div>
@@ -115,7 +115,7 @@
         </div>
     </section>
 
-    <section class="about-section" id="about">
+    <section class="about-section" data-cms-section="about" @if (!($homeSections['about']['visible'] ?? true)) hidden @endif id="about">
         <div class="about-image-wrap">
             <img src="{{ asset('images/home/residential-project.webp') }}" width="1500" height="850" loading="lazy" alt="Residential building in Rwanda, part of the built environment GECO Africa supports">
             <span class="about-image-label"><span></span> Local expertise · Since 2007</span>
@@ -130,7 +130,7 @@
         </div>
     </section>
 
-    <section class="section home-principles-section">
+    <section class="section home-principles-section" data-cms-section="principles" @if (!($homeSections['principles']['visible'] ?? true)) hidden @endif>
         <div class="site-container">
             <div class="section-heading">
                 <div>
@@ -151,7 +151,7 @@
         </div>
     </section>
 
-    <section class="home-laboratory-section">
+    <section class="home-laboratory-section" data-cms-section="laboratory" @if (!($homeSections['laboratory']['visible'] ?? true)) hidden @endif>
         <div class="home-laboratory-visual">
             <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" loading="lazy" alt="GECO Africa drilling team carrying out ground investigation work in Rwanda">
             <div><small>Ground investigation · Soil mechanics · Testing</small><strong>Evidence that helps<br>projects move forward.</strong></div>
@@ -172,7 +172,7 @@
         </div>
     </section>
 
-    <section class="section experience-section home-experience-section" id="experience">
+    <section class="section experience-section home-experience-section" data-cms-section="experience" @if (!($homeSections['experience']['visible'] ?? true)) hidden @endif id="experience">
         <div class="site-container experience-grid">
             <div class="experience-intro">
                 <p class="eyebrow"><span class="eyebrow-line"></span> Experience that matters</p>
@@ -196,7 +196,7 @@
         </div>
     </section>
 
-    <section class="contact-section" id="contact">
+    <section class="contact-section" data-cms-section="contact" @if (!($homeSections['contact']['visible'] ?? true)) hidden @endif id="contact">
         <div class="site-container contact-inner">
             <div>
                 <p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> Let's build with confidence</p>
@@ -210,5 +210,15 @@
             <svg class="contact-contour" viewBox="0 0 300 260" fill="none" aria-hidden="true"><path d="M296 9C224 6 151 15 93 47 36 78 10 119 8 157c-2 37 30 66 71 82 43 17 106 17 161 10M296 42c-61-1-119 8-165 33-46 26-66 58-66 86 0 28 23 48 56 61 34 12 82 13 124 8M295 77c-49 1-92 8-126 27-34 19-48 42-47 62 1 18 17 32 42 41 25 9 60 9 91 5M294 112c-35 2-64 8-87 20-22 13-31 27-29 39 2 12 13 21 31 27 17 5 39 6 58 3"/></svg>
         </div>
     </section>
-</main>
+<script>
+(() => {
+    const settings = @json($homeSections ?? []);
+    const main = document.getElementById('main-content');
+    if (!main) return;
+    Object.entries(settings).sort((a, b) => (a[1].order ?? 999) - (b[1].order ?? 999)).forEach(([key, setting]) => {
+        const section = main.querySelector(`[data-cms-section="${key}"]`);
+        if (section) { section.hidden = setting.visible === false; main.appendChild(section); }
+    });
+})();
+</script></main>
 @endsection

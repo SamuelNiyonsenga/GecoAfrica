@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactEnquiryReceived;
 use App\Models\ContactMessage;
+use App\Models\CmsSiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -78,7 +79,8 @@ class ContactController extends Controller
         ]);
 
         try {
-            Mail::to(config('contact.recipient'))->send(new ContactEnquiryReceived($enquiry));
+            $siteSettings = CmsSiteSetting::query()->find(1)?->fields ?? [];
+            Mail::to($siteSettings['notification_email'] ?? config('contact.recipient'))->send(new ContactEnquiryReceived($enquiry));
         } catch (Throwable $exception) {
             report($exception);
         }
