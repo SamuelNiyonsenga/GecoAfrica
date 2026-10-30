@@ -84,7 +84,7 @@ class CmsContentTypes
                 'readTime' => ['label' => 'Reading time', 'type' => 'text'],
                 'serviceAnchor' => ['label' => 'Related service key', 'type' => 'text'],
                 'serviceLabel' => ['label' => 'Related service name', 'type' => 'text'],
-                'sections' => ['label' => 'Article sections (structured JSON)', 'type' => 'json'],
+                'sections' => ['label' => 'Article sections', 'type' => 'json', 'template' => [['heading' => '', 'paragraphs' => ['']]]],
             ]],
             'gallery-categories' => ['type' => 'gallery_category', 'label' => 'Gallery categories', 'singular' => 'gallery category', 'fields' => [
                 'name' => ['label' => 'Category name', 'type' => 'text', 'required' => true],

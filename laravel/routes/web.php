@@ -64,7 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/content/{section}', [CmsContentController::class, 'store'])->name('content.store');
         Route::get('/content/{section}/{entry}/edit', [CmsContentController::class, 'edit'])->name('content.edit');
         Route::put('/content/{section}/{entry}', [CmsContentController::class, 'update'])->name('content.update');
-        Route::post('/content/{section}/{entry}/publish', [CmsContentController::class, 'publish'])->name('content.publish');
+        Route::put('/content/{section}/{entry}/publish', [CmsContentController::class, 'publish'])->name('content.publish');
         Route::post('/content/{section}/{entry}/unpublish', [CmsContentController::class, 'unpublish'])->name('content.unpublish');
         Route::delete('/content/{section}/{entry}', [CmsContentController::class, 'destroy'])->name('content.destroy');
         Route::post('/content/{section}/{entry}/versions/{version}/restore', [CmsContentController::class, 'restoreVersion'])->name('content.restore-version');

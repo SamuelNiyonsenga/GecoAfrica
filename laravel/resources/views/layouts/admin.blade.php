@@ -21,4 +21,4 @@
 @if (session('success'))<div class="notice notice-success" role="status">{{ session('success') }}</div>@endif
 @if ($errors->any())<div class="notice notice-error" role="alert"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 @yield('content')
-</main></div></body></html>
+</main></div><script src="{{ asset('js/admin-structured.js') }}?v={{ filemtime(public_path('js/admin-structured.js')) }}" defer></script></body></html>

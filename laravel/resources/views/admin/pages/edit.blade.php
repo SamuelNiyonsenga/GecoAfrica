@@ -2,17 +2,22 @@
 @section('title', 'Edit '.$label)
 @section('content')
 <header class="page-heading"><div><p class="eyebrow"><a href="{{ route('admin.pages.index') }}">Pages</a> / English</p><h1>{{ $label }}</h1><p class="muted">Edit page text and search details. Published content stays live until you publish.</p></div></header>
-@php($editorFields = $translation->draft_fields ?? [])
-@if($page->page_key === 'home') @php(unset($editorFields['homeSections'])) @endif
+@php
+    $editorFields = (array) ($translation->draft_fields ?? []);
+    if ($page->page_key === 'home') unset($editorFields['homeSections']);
+@endphp
 <form method="post" action="{{ route('admin.pages.draft', $page->page_key) }}" class="panel editor-form">@csrf
 @if($page->page_key === 'home')
 <section class="home-section-manager"><h2>Homepage sections</h2><p class="muted">Choose which sections visitors see and set their display order. Lower numbers appear first.</p><div class="table-scroll"><table class="content-table"><thead><tr><th>Section</th><th>Show on site</th><th>Display order</th></tr></thead><tbody>@foreach($sectionSettings as $key => $section)<tr><td><strong>{{ $section['label'] }}</strong></td><td><input type="hidden" name="home_sections[{{ $key }}][visible]" value="0"><input type="checkbox" name="home_sections[{{ $key }}][visible]" value="1" @checked($section['visible']) aria-label="Show {{ $section['label'] }}"></td><td><input type="number" name="home_sections[{{ $key }}][order]" min="1" max="100" value="{{ $section['order'] }}" required aria-label="Display order for {{ $section['label'] }}"></td></tr>@endforeach</tbody></table></div></section><hr class="rule">
 @endif
 <h2>Page content and metadata</h2><div class="form-grid">
 @foreach($editorFields as $key => $value)
-@php($oldValue = old('fields.'.$key))
+@php
+    $oldValue = old('fields.'.$key);
+@endphp
 <div class="field {{ is_array($value) || in_array($key, ['pageDescription','ogImageAlt'], true) ? 'field-wide' : '' }}"><label for="page-field-{{ $key }}">{{ str($key)->headline() }}</label>
-@if(is_array($value))<textarea id="page-field-{{ $key }}" name="fields[{{ $key }}]" rows="{{ in_array($key,['heroSlides','structuredData','projects'],true)?16:8 }}" class="code-field" spellcheck="false">{{ is_string($oldValue) ? $oldValue : json_encode($oldValue ?? $value, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</textarea><small>Structured data. Keep valid JSON; this supports lists and nested fields.</small>
+@if(is_array($value))
+<div class="structured-editor" data-structured-editor data-label="{{ str($key)->headline() }}"><input type="hidden" name="fields[{{ $key }}]" value="{{ is_string($oldValue) ? $oldValue : json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}" data-structured-value><div data-structured-root></div></div><small>Manage these items with the fields below. Use Add and Remove to change the list.</small>
 @elseif(in_array($key, ['pageDescription','ogImageAlt'], true))<textarea id="page-field-{{ $key }}" name="fields[{{ $key }}]" rows="3">{{ $oldValue ?? $value }}</textarea>
 @else<input id="page-field-{{ $key }}" name="fields[{{ $key }}]" value="{{ $oldValue ?? $value }}" maxlength="20000">@endif
 @error('fields.'.$key)<span class="field-error">{{ $message }}</span>@enderror</div>

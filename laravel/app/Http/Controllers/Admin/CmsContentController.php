@@ -59,18 +59,27 @@ class CmsContentController extends Controller
         $definition = $this->definition($section);
         $meta = $this->validateMeta($request, $definition, null);
         $fields = $this->validateFields($request, $definition);
-
-        $entry = CmsContentEntry::query()->create(array_merge($meta, [
+        $publish = $request->input('intent') === 'publish';
+        $entry = new CmsContentEntry(array_merge($meta, [
             'type' => $definition['type'],
-            'status' => 'draft',
-            'published_at' => null,
+            'status' => $publish ? 'published' : 'draft',
+            'published_at' => $publish ? now() : null,
         ]));
-        $entry->translations()->create(['locale_code' => 'en', 'draft_fields' => $fields, 'published_fields' => null]);
-        $this->audit($request, 'content.create', $entry);
+        if ($publish) $this->validatePublish($entry, $fields, $definition);
 
-        return to_route('admin.content.edit', [$section, $entry])->with('success', 'Draft created. Publish it when it is ready.');
+        DB::transaction(function () use ($entry, $fields, $publish, $request): void {
+            $entry->save();
+            $entry->translations()->create([
+                'locale_code' => 'en',
+                'draft_fields' => $fields,
+                'published_fields' => $publish ? $fields : null,
+            ]);
+            if ($publish) $this->saveVersion($entry, $fields, $request->user()?->id);
+        });
+        $this->audit($request, $publish ? 'content.publish' : 'content.create', $entry);
+
+        return to_route('admin.content.edit', [$section, $entry])->with('success', $publish ? 'Content created and published.' : 'Draft created. Publish it when it is ready.');
     }
-
     public function edit(string $section, CmsContentEntry $entry): View
     {
         $definition = $this->definition($section);
@@ -110,25 +119,26 @@ class CmsContentController extends Controller
     {
         $definition = $this->definition($section);
         abort_unless($entry->type === $definition['type'], 404);
-        $translation = $entry->translations()->where('locale_code', 'en')->first();
-        $fields = $translation?->draft_fields ?? [];
+        $meta = $this->validateMeta($request, $definition, $entry);
+        $fields = $this->validateFields($request, $definition, $entry->draftFields('en'));
+        $entry->fill($meta);
         $this->validatePublish($entry, $fields, $definition);
 
-        DB::transaction(function () use ($entry, $translation, $fields, $request): void {
-            if ($translation?->published_fields) {
+        DB::transaction(function () use ($entry, $meta, $fields, $request): void {
+            $entry->update(array_merge($meta, ['status' => 'published', 'published_at' => now()]));
+            $translation = $entry->translations()->firstOrNew(['locale_code' => 'en']);
+            if (!empty($translation->published_fields)) {
                 $this->saveVersion($entry, $translation->published_fields, $request->user()?->id);
             }
-            $translation->published_fields = $fields;
             $translation->draft_fields = $fields;
+            $translation->published_fields = $fields;
             $translation->save();
-            $entry->update(['status' => 'published', 'published_at' => now()]);
             $this->saveVersion($entry, $fields, $request->user()?->id);
         });
         $this->audit($request, 'content.publish', $entry);
 
-        return back()->with('success', 'Content published.');
+        return back()->with('success', 'Changes saved and published. The website now shows this version.');
     }
-
     public function unpublish(Request $request, string $section, CmsContentEntry $entry): RedirectResponse
     {
         $definition = $this->definition($section);
