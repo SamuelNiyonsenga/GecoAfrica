@@ -1794,3 +1794,45 @@ button { font: inherit; }
     .gallery-featured-photo img,
     .insights-hero-visual { border-top-right-radius: 44px; }
 }
+
+/* Readable paragraph copy; keep navigation, controls and compact labels unchanged. */
+.about-body,
+.experience-intro > p:not(.eyebrow),
+.about-story-heading > p:not(.eyebrow),
+.about-story-content,
+.about-timeline-item p,
+.about-projects-grid > div > p:last-child,
+.purpose-card p,
+.capability-card > p,
+.person-bio,
+.about-resources-inner > div > p:last-child,
+.service-card > p,
+.service-detail-intro,
+.service-approach-grid > div:first-child > p:last-child,
+.featured-project-body > p:last-of-type,
+.project-source-note p,
+.project-directory-aside > p,
+.project-reference-heading p,
+.project-reference-card p,
+.selected-experience-intro,
+.home-showcase-description,
+.home-project-description,
+.home-project-footnote p,
+.home-principle-card p,
+.home-laboratory-copy > p:not(.eyebrow) {
+    font-size: 16px;
+}
+
+.heading-aside { font-size: 16px; }
+@media (max-width: 800px) {
+    .home-showcase-description { font-size: 16px; }
+}
+@media (max-width: 560px) {
+    .home-showcase-description,
+    .home-project-description,
+    .home-project-footnote p,
+    .home-laboratory-copy > p:not(.eyebrow) { font-size: 15px; }
+}
+/* Keep standalone links readable without changing paragraph or heading links. */
+body a:not(:where(p *, h1 *, h2 *, h3 *, h4 *, h5 *, h6 *)) { font-size: 14px !important; }
+body .primary-navigation { font-size: 15px !important; }

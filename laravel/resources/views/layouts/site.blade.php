@@ -60,6 +60,7 @@
             </button>
 
             <nav class="primary-navigation" id="primary-navigation" aria-label="Main navigation">
+                <a href="{{ route('home') }}" @class(['nav-current' => request()->routeIs('home')]) @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
                 <a href="{{ route('about') }}" @class(['nav-current' => request()->routeIs('about')]) @if(request()->routeIs('about')) aria-current="page" @endif>About</a>
                 <a href="{{ route('services') }}" @class(['nav-current' => request()->routeIs('services')]) @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
                 <a href="{{ route('projects') }}" @class(['nav-current' => request()->routeIs('projects')]) @if(request()->routeIs('projects')) aria-current="page" @endif>Projects</a>
