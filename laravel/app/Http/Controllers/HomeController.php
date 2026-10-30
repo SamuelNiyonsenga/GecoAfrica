@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Data\ServicesCatalog;
+use App\Data\ProjectsCatalog;
+use Illuminate\View\View;
+
+class HomeController extends Controller
+{
+    public function index(): View
+    {
+        return view('home', [
+            'pageTitle' => 'GECO Africa | Geotechnical, Civil Engineering & Construction in Rwanda',
+            'pageDescription' => 'GECO Africa Ltd is a 100% Rwandan-owned engineering and construction consultancy founded in 2007. Explore geotechnical investigations, soil testing, road and building design, construction supervision and project references across Rwanda.',
+            'canonicalUrl' => 'https://gecoafrica.com/',
+            'preloadImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
+            'ogImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
+            'ogImageAlt' => 'GECO Africa field team conducting a geotechnical site investigation in Rwanda',
+            'structuredData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'ProfessionalService',
+                '@id' => 'https://gecoafrica.com/#organization',
+                'name' => 'GECO Africa Ltd',
+                'url' => 'https://gecoafrica.com/',
+                'image' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
+                'description' => 'Civil engineering and geotechnical consultancy in Rwanda.',
+                'telephone' => ['+250788842990', '+250788572346'],
+                'email' => 'info@gecoafrica.com',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => 'Avenue des Poids Lourds',
+                    'postOfficeBoxNumber' => '3711',
+                    'addressLocality' => 'Kigali',
+                    'addressCountry' => 'RW',
+                ],
+                'areaServed' => 'Rwanda',
+                'slogan' => 'Designing and building for ever',
+                'knowsAbout' => [
+                    'Geotechnical engineering',
+                    'Geological and geophysical surveys',
+                    'Core drilling and soil mechanics laboratory testing',
+                    'Civil engineering',
+                    'Road, pavement and drainage design',
+                    'Architectural and structural building design',
+                    'Environmental impact assessment',
+                    'Tender documentation and bills of quantities',
+                    'Construction supervision and quality control',
+                ],
+                'foundingDate' => '2007',
+            ],
+            'services' => ServicesCatalog::homepageCards(),
+            'featuredProjects' => ProjectsCatalog::featured(),
+            'projectReferenceCount' => ProjectsCatalog::referenceCount(),
+            'heroSlides' => [
+                [
+                    'eyebrow' => 'GECO Africa Ltd · Rwanda · Since 2007',
+                    'headline' => 'Engineering the',
+                    'accentHeadline' => 'foundations of progress.',
+                    'description' => 'A 100% Rwandan-owned engineering and construction consultancy. We bring technical expertise and human values together to improve society through the quality of our work.',
+                    'image' => 'images/home/fieldwork-drilling.webp',
+                    'alt' => 'GECO Africa field team conducting a geotechnical investigation in Rwanda',
+                    'caption' => 'Geotechnical investigation · Rwanda',
+                    'detail' => 'From ground evidence to confident design',
+                    'primaryLabel' => 'Explore our services',
+                    'primaryUrl' => route('services'),
+                    'secondaryLabel' => 'Our story',
+                    'secondaryUrl' => route('about'),
+                ],
+                [
+                    'eyebrow' => 'Construction supervision · Ruhango District',
+                    'headline' => 'Ruhango District’s',
+                    'accentHeadline' => 'asphalt road works.',
+                    'description' => 'Construction supervision for asphalt road works in Ruhango District—part of GECO Africa’s published project and gallery record.',
+                    'image' => 'images/gallery/bg_4.jpg',
+                    'alt' => 'Completed asphalt road and pedestrian crossing associated with GECO’s Ruhango supervision work',
+                    'caption' => 'Asphalt road construction supervision',
+                    'detail' => 'Road design · Site supervision · Rwanda',
+                    'primaryLabel' => 'Explore project references',
+                    'primaryUrl' => route('projects'),
+                    'secondaryLabel' => 'Road engineering services',
+                    'secondaryUrl' => route('services').'#road-design-and-supervision',
+                ],
+                [
+                    'eyebrow' => 'Building study · Musanze District',
+                    'headline' => 'A centre for learning',
+                    'accentHeadline' => 'and support.',
+                    'description' => 'Study for construction of the Centre de Formation et d’Encadrement des Enfants de la Rue in Musanze District, retained from the former GECO homepage.',
+                    'image' => 'images/gallery/bg_3.jpg',
+                    'alt' => 'Architectural project rendering published for the children’s training and support centre in Musanze',
+                    'caption' => 'Centre de Formation et d’Encadrement des Enfants de la Rue',
+                    'detail' => 'Study for construction · Musanze District',
+                    'primaryLabel' => 'View project directory',
+                    'primaryUrl' => route('projects').'#project-references',
+                    'secondaryLabel' => 'Building design services',
+                    'secondaryUrl' => route('services').'#building-design-and-supervision',
+                ],
+                [
+                    'eyebrow' => 'Project study · Rulindo District',
+                    'headline' => 'The Muyanza ceramic',
+                    'accentHeadline' => 'factory study.',
+                    'description' => 'Study for construction of the Muyanza Ceramic Factory in Rulindo District, featured in GECO’s original home slider and gallery.',
+                    'image' => 'images/gallery/bg_2.jpg',
+                    'alt' => 'Architectural rendering of an industrial and ceramic factory development in Rwanda',
+                    'caption' => 'Muyanza Ceramic Factory',
+                    'detail' => 'Study for construction · Rulindo District',
+                    'primaryLabel' => 'View project references',
+                    'primaryUrl' => route('projects'),
+                    'secondaryLabel' => 'Discuss a project',
+                    'secondaryUrl' => route('contact'),
+                ],
+                [
+                    'eyebrow' => 'Building design · Construction supervision',
+                    'headline' => 'Thoughtful design.',
+                    'accentHeadline' => 'Careful delivery.',
+                    'description' => 'From feasibility studies, survey and geotechnical input to architectural and structural design, tender documents and construction oversight.',
+                    'image' => 'images/home/residential-project.webp',
+                    'alt' => 'Completed multi-storey building project in Rwanda',
+                    'caption' => 'Building design and supervision',
+                    'detail' => 'Studies · Design · Construction quality',
+                    'primaryLabel' => 'See building services',
+                    'primaryUrl' => route('services').'#building-design-and-supervision',
+                    'secondaryLabel' => 'View project references',
+                    'secondaryUrl' => route('projects'),
+                ],
+            ],
+            'companyPrinciples' => [
+                ['number' => '01', 'label' => 'Our vision', 'title' => 'A premier engineering voice', 'text' => 'To become a premier Rwandan, African and international think tank on geotechnical engineering, infrastructure projects and service provision.'],
+                ['number' => '02', 'label' => 'Our objective', 'title' => 'Quality that serves society', 'text' => 'To improve society through the quality of our work, and spread our technical expertise and human values to the whole world.'],
+                ['number' => '03', 'label' => 'Our motto', 'title' => 'Designing and building for ever', 'text' => 'A lasting commitment to sound engineering, thoughtful construction and value that continues beyond project completion.'],
+            ],
+            'laboratoryCapabilities' => [
+                'Consolidation', 'Permeability', 'Shear strength', 'Hydrometer', 'In-situ density', 'Penetrometer', 'Modified Proctor',
+            ],
+            'experience' => [
+                'Geotechnical investigations for major buildings and infrastructure',
+                'Geological and geophysical surveys, rotary and core drilling, casing pipes, piezometers and SPT testing',
+                'Soil sampling and laboratory materials testing',
+                'Road, water supply and topographic survey projects, GIS and mapping',
+                'Feasibility, hydraulic, traffic, geological and geotechnical studies',
+                'Road geometry and pavement design, tender documents and bills of quantities',
+                'Environmental impact assessment, construction supervision and quality control',
+                'Architectural and structural design, drafting, project reporting and civil works',
+            ],
+        ]);
+    }
+}
