@@ -475,12 +475,12 @@ button { font: inherit; }
 .service-approach-grid h2 em, .services-contact-inner h2 em { color: var(--lime); }
 .service-approach-grid > div:first-child > p:last-child { max-width: 400px; margin: 19px 0 0; color: #c4d1c7; font-size: var(--fs-small); line-height: 1.8; }
 .service-approach-steps { border-top: 1px solid rgba(222, 234, 222, .2); }
-.service-approach-steps a { display: grid; grid-template-columns: 35px 1fr 16px; align-items: center; gap: 12px; min-height: 75px; border-bottom: 1px solid rgba(222, 234, 222, .2); }
-.service-approach-steps a > span { color: var(--lime); font-family: var(--serif); font-size: 16px; }
+.service-approach-steps a { display: grid; grid-template-columns: 35px 1fr 16px; grid-template-rows: auto auto; align-items: center; column-gap: 12px; row-gap: 3px; min-height: 75px; border-bottom: 1px solid rgba(222, 234, 222, .2); }
+.service-approach-steps a > span { grid-column: 1; grid-row: 1 / span 2; color: var(--lime); font-family: var(--serif); font-size: 16px; }
 .service-approach-steps strong, .service-approach-steps small { display: block; }
-.service-approach-steps strong { color: white; font-family: var(--serif); font-size: 15px; font-weight: 400; }
-.service-approach-steps small { margin-top: 3px; color: #bdccc2; font-size: var(--fs-caption); }
-.service-approach-steps i { color: #a9bcaa; font-size: var(--fs-small); font-style: normal; }
+.service-approach-steps strong { grid-column: 2; grid-row: 1; align-self: end; color: white; font-family: var(--serif); font-size: 15px; font-weight: 400; }
+.service-approach-steps small { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; color: #bdccc2; font-size: var(--fs-caption); }
+.service-approach-steps i { grid-column: 3; grid-row: 1 / span 2; color: #a9bcaa; font-size: var(--fs-small); font-style: normal; }
 .services-contact-section { position: relative; overflow: hidden; color: white; background: var(--forest-deep); }
 .services-contact-inner { position: relative; display: grid; min-height: 365px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 50px; padding-block: 70px; }
 .services-contact-inner h2 { font-size: clamp(47px, 5.2vw, 70px); }
@@ -528,8 +528,11 @@ button { font: inherit; }
     .service-detail-copy h2 { font-size: 40px; }
     .service-scope-list { grid-template-columns: 1fr; gap: 8px; }
     .service-approach-grid h2 { font-size: 43px; }
-    .service-approach-steps a { grid-template-columns: 28px 1fr 13px; gap: 10px; }
-    .service-approach-steps small { font-size: var(--fs-caption); }
+    .service-approach-steps a { grid-template-columns: 28px 1fr 13px; grid-template-rows: auto auto; column-gap: 10px; row-gap: 3px; }
+    .service-approach-steps a > span { grid-column: 1; grid-row: 1 / span 2; }
+    .service-approach-steps i { grid-column: 3; grid-row: 1 / span 2; }
+    .service-approach-steps strong { grid-column: 2; grid-row: 1; align-self: end; }
+    .service-approach-steps small { grid-column: 2; grid-row: 2; align-self: start; margin-top: 0; font-size: var(--fs-caption); }
     .services-contact-inner h2 { font-size: 55px; }
 }
 
