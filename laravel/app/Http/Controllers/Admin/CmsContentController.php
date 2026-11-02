@@ -205,12 +205,16 @@ class CmsContentController extends Controller
             'parent_id' => ['nullable', 'integer', 'exists:cms_content_entries,id'],
             'is_featured' => ['nullable', 'boolean'],
         ]);
-        $duplicate = CmsContentEntry::query()->where('type', $definition['type'])->where('slug', $data['slug']);
+        $duplicate = CmsContentEntry::withTrashed()->where('type', $definition['type'])->where('slug', $data['slug']);
         if ($entry) {
             $duplicate->where('id', '<>', $entry->id);
         }
-        if ($duplicate->exists()) {
-            throw ValidationException::withMessages(['slug' => 'That address is already used by another item of this type.']);
+        $duplicateEntry = $duplicate->first();
+        if ($duplicateEntry) {
+            $message = $duplicateEntry->trashed()
+                ? 'That address is used by an item in Trash. Restore that item, or choose a different address.'
+                : 'That address is already used by another item of this type.';
+            throw ValidationException::withMessages(['slug' => $message]);
         }
         if (!empty($definition['parent_type']) && !empty($data['parent_id'])) {
             $validParent = CmsContentEntry::query()->whereKey($data['parent_id'])->where('type', $definition['parent_type'])->exists();
