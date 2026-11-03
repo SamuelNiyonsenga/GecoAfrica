@@ -15,7 +15,7 @@
                 <div class="insight-article-byline"><span>{{ $article['category'] }}</span><i aria-hidden="true"></i><span>{{ $article['readTime'] }}</span><span class="insight-byline-company">GECO Africa · Engineering guide</span></div>
             </div>
             <figure class="insight-article-cover">
-                <img src="{{ asset($article['image']) }}" width="1600" height="900" alt="{{ $article['imageAlt'] }}" fetchpriority="high">
+                <img src="{{ asset($article['image']) }}" width="1600" height="900" alt="{{ $article['imageAlt'] }}" fetchpriority="high" decoding="async">
                 <figcaption><span>{{ $article['imageAlt'] }}</span><span>GECO Africa · Rwanda</span></figcaption>
             </figure>
         </div>
@@ -55,6 +55,9 @@
                     <span class="insight-aside-label">Continue exploring</span>
                     <a href="{{ route('projects') }}">Browse GECO project references <span aria-hidden="true">↗</span></a>
                     <a href="{{ route('contact') }}">Discuss a project with our team <span aria-hidden="true">↗</span></a>
+                    @if ($nextArticle)
+                        <a class="insight-next-article" href="{{ route('blog.show', $nextArticle['slug']) }}"><small>Next guide</small>{{ $nextArticle['title'] }} <span aria-hidden="true">→</span></a>
+                    @endif
                 </div>
             </article>
         </div>
@@ -69,7 +72,7 @@
             <div class="insights-related-grid">
                 @foreach ($relatedArticles as $related)
                     <article class="insight-related-card">
-                        <a href="{{ route('blog.show', $related['slug']) }}" class="insight-related-image"><img src="{{ asset($related['image']) }}" width="900" height="506" loading="lazy" alt="{{ $related['imageAlt'] }}"><span aria-hidden="true">↗</span></a>
+                        <a href="{{ route('blog.show', $related['slug']) }}" class="insight-related-image"><img src="{{ asset($related['image']) }}" width="900" height="506" loading="lazy" decoding="async" alt="{{ $related['imageAlt'] }}"><span aria-hidden="true">↗</span></a>
                         <div><p class="insight-card-meta"><span>{{ $related['category'] }}</span><i aria-hidden="true"></i><span>{{ $related['readTime'] }}</span></p><h3><a href="{{ route('blog.show', $related['slug']) }}">{{ $related['title'] }}</a></h3><a class="insight-read-link" href="{{ route('blog.show', $related['slug']) }}">Read the guide <span aria-hidden="true">→</span></a></div>
                     </article>
                 @endforeach

@@ -8,16 +8,16 @@
                 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{{ route('home') }}">Home</a><span aria-hidden="true">/</span><span aria-current="page">Activities</span></nav>
                 <p class="eyebrow"><span class="eyebrow-line"></span> Fieldwork · Studies · Project delivery</p>
                 <h1>Engineering in action.<br><em>Across Rwanda.</em></h1>
-                <p>Explore assignments GECO Africa published on its former activities page. The archive records real client work across geotechnical investigation, core drilling, surveying, water supply and building assessments.</p>
+                <p>Explore GECO Africa’s engineering assignments across geotechnical investigation, core drilling, surveying, water supply and building assessments.</p>
                 <div class="activities-hero-facts">
                     <div><strong>{{ count($activities) }}</strong><span>published assignments</span></div>
-                    <div><strong>2021–22</strong><span>activity archive dates</span></div>
+                    <div><strong>2021–22</strong><span>Activity dates</span></div>
                     <div><strong>{{ str_pad((string) count($categories), 2, '0', STR_PAD_LEFT) }}</strong><span>engineering categories</span></div>
                 </div>
-                <a class="button button-dark" href="#activity-archive">Explore the activity archive <span aria-hidden="true">↓</span></a>
+                <a class="button button-dark" href="#activity-archive">Explore activities <span aria-hidden="true">↓</span></a>
             </div>
             <figure class="activities-hero-visual">
-                <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" fetchpriority="high" alt="GECO Africa field team carrying out a geotechnical site investigation in Rwanda">
+                <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" fetchpriority="high" decoding="async" alt="GECO Africa field team carrying out a geotechnical site investigation in Rwanda">
                 <figcaption><span>GECO Africa · Rwanda</span><strong>Ground evidence.<br>Practical engineering.</strong></figcaption>
             </figure>
         </div>
@@ -26,8 +26,8 @@
     <section class="activities-archive-section section" id="activity-archive">
         <div class="site-container">
             <div class="section-heading activities-section-heading">
-                <div><p class="eyebrow"><span class="eyebrow-line"></span> From the legacy activity archive</p><h2>Published work,<br><em>clearly recorded.</em></h2></div>
-                <p class="heading-aside">Each assignment keeps the title, client, date and duration shown in GECO’s public archive. Use the filters to find work by engineering discipline.</p>
+                <div><p class="eyebrow"><span class="eyebrow-line"></span> Engineering activities</p><h2>Engineering work,<br><em>clearly recorded.</em></h2></div>
+                <p class="heading-aside">Each assignment includes its title, client, date and duration. Use the filters to find work by engineering discipline.</p>
             </div>
 
             <div class="activity-filter-panel" aria-label="Filter published assignments">

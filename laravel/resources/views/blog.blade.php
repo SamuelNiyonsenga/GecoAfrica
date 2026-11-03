@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="insights-hero-visual">
-                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="Geotechnical field investigation by GECO Africa in Rwanda" fetchpriority="high">
+                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="Geotechnical field investigation by GECO Africa in Rwanda" fetchpriority="high" decoding="async">
                     <div class="insights-hero-image-shade" aria-hidden="true"></div>
                     <div class="insights-hero-caption"><span>From field evidence to informed decisions</span><small>Geotechnical engineering · Rwanda</small></div>
                     <span class="insights-hero-index" aria-hidden="true">GECO / 01</span>
@@ -50,7 +50,7 @@
                 @foreach ($articles as $article)
                     <article class="insight-card @if ($loop->first) insight-card-featured @endif">
                         <a class="insight-card-image" href="{{ route('blog.show', $article['slug']) }}" aria-label="Read: {{ $article['title'] }}">
-                            <img src="{{ asset($article['image']) }}" width="1200" height="675" alt="{{ $article['imageAlt'] }}" @if (!$loop->first) loading="lazy" @endif>
+                            <img src="{{ asset($article['image']) }}" width="1200" height="675" alt="{{ $article['imageAlt'] }}" loading="lazy" decoding="async">
                             <span class="insight-image-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                             <span class="insight-image-arrow" aria-hidden="true">↗</span>
                         </a>

@@ -12,7 +12,7 @@
                 <div class="partners-hero-copy">
                     <p class="eyebrow"><span class="eyebrow-line"></span> Collaboration · Standards · Progress</p>
                     <h1>Good engineering is a <em>shared effort.</em></h1>
-                    <p class="partners-hero-intro">Explore the organizations GECO Africa named on its former partner page, alongside current details and direct links to their official websites.</p>
+                    <p class="partners-hero-intro">Explore organizations connected with GECO Africa’s work, with information and links to their official websites.</p>
                     <div class="hero-actions">
                         <a class="button button-dark" href="#partner-directory">Explore the directory <span aria-hidden="true">↓</span></a>
                         <a class="text-link" href="{{ route('about') }}">About GECO <span aria-hidden="true">→</span></a>
@@ -48,7 +48,7 @@
                     <p class="eyebrow"><span class="eyebrow-line"></span> Organizations</p>
                     <h2>Shared capability.<br><em>Different disciplines.</em></h2>
                 </div>
-                <p class="partners-directory-intro">This directory preserves every organization and logo from GECO Africa’s previous Partners page. Each profile adds a concise introduction based on the organization’s current public information.</p>
+                <p class="partners-directory-intro">Explore engineering, education, standards and field service organizations, with concise introductions and links to their official websites.</p>
             </div>
 
             <div class="partners-grid">
@@ -59,7 +59,7 @@
                             <span class="partner-category">{{ $partner['category'] }}</span>
                         </div>
                         <div class="partner-logo-panel">
-                            <img src="{{ asset($partner['image']) }}" width="360" height="220" alt="{{ $partner['alt'] }}" loading="lazy">
+                            <img src="{{ asset($partner['image']) }}" width="300" height="190" alt="{{ $partner['alt'] }}" loading="lazy" decoding="async">
                         </div>
                         <div class="partner-card-content">
                             @if ($partner['legacyName'])
@@ -75,7 +75,7 @@
                 @endforeach
             </div>
 
-            <p class="partners-history-note"><span aria-hidden="true">i</span><span><strong>About this directory</strong> These organizations appeared on GECO Africa’s former website as partners. The original page did not describe the scope or current status of each relationship; this directory preserves the published list without implying that every relationship remains active.</span></p>
+            <p class="partners-history-note"><span aria-hidden="true">i</span><span><strong>About this directory</strong> This directory lists organizations associated with GECO Africa. The available information does not specify the scope or current status of each relationship.</span></p>
         </div>
     </section>
 

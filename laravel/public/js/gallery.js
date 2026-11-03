@@ -46,7 +46,7 @@
         dialogTitle.textContent = button.dataset.galleryTitle;
         dialogCategory.textContent = button.dataset.galleryCategory;
         dialogCaption.textContent = button.dataset.galleryCaption;
-        dialogCount.textContent = `${String(currentIndex + 1).padStart(2, '0')} / ${String(currentButtons.length).padStart(2, '0')}`;
+        dialogCount.textContent = `${currentIndex + 1} / ${currentButtons.length}`;
         previousButton.disabled = currentButtons.length < 2;
         nextButton.disabled = currentButtons.length < 2;
     };
@@ -75,4 +75,19 @@
         if (event.key === 'ArrowLeft') showPhoto(currentIndex - 1);
         if (event.key === 'ArrowRight') showPhoto(currentIndex + 1);
     });
+
+    const imageWrap = page.querySelector('.gallery-lightbox-image-wrap');
+    let touchStartX = 0;
+    let touchStartY = 0;
+    imageWrap?.addEventListener('touchstart', (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+    }, { passive: true });
+    imageWrap?.addEventListener('touchend', (event) => {
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY)) showPhoto(currentIndex + (deltaX < 0 ? 1 : -1));
+    }, { passive: true });
 })();

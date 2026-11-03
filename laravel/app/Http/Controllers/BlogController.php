@@ -75,10 +75,12 @@ class BlogController extends Controller
             CmsContentRepository::blog(),
             static fn (array $item): bool => $item['slug'] !== $article['slug'],
         ));
+        $nextArticle = $related[0] ?? null;
 
         return view('blog-article', [
             'article' => $article,
             'relatedArticles' => array_slice($related, 0, 2),
+            'nextArticle' => $nextArticle,
             'pageTitle' => $article['title'].' | GECO Africa Insights',
             'pageDescription' => $article['summary'],
             'canonicalUrl' => 'https://gecoafrica.com/blog/'.$article['slug'].'/',

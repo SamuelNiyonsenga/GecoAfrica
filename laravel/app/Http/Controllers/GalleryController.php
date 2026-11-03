@@ -16,6 +16,7 @@ class GalleryController extends Controller
             $filter['count'] = count(array_filter($photos, static fn (array $photo): bool => $photo['category'] === $filter['id']));
         }
         unset($filter);
+        array_unshift($filters, ['id' => 'all', 'label' => 'All', 'count' => count($photos)]);
 
         $items = array_map(static fn (array $photo, int $index): array => [
             '@type' => 'ListItem',

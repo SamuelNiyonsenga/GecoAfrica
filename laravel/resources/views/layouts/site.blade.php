@@ -107,7 +107,7 @@
                 <a href="{{ route('services') }}">Our services</a>
                 <a href="{{ route('projects') }}">Project references</a>
                 <a href="{{ route('gallery') }}">Photo gallery</a>
-                <a href="{{ route('activities') }}">Activities archive</a>
+                <a href="{{ route('activities') }}">Activities</a>
                 <a href="{{ route('blog') }}">Insights &amp; articles</a>
                 <a href="{{ route('team') }}">Our team</a>
                 <a href="{{ route('partners') }}">Our partners</a>

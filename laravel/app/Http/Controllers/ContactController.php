@@ -49,7 +49,7 @@ class ContactController extends Controller
     public function store(Request $request): RedirectResponse
     {
         if ($request->filled('company_website')) {
-            return to_route('contact')->with('contact_success', 'Thank you. Your enquiry has been received.');
+            return to_route('contact')->withErrors(['contact' => 'We could not send that enquiry. Please try again.']);
         }
 
         $validated = $request->validate([

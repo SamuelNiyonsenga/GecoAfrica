@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="services-hero-visual">
-                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="GECO Africa field team conducting a geotechnical investigation in Rwanda" fetchpriority="high">
+                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="GECO Africa field team conducting a geotechnical investigation in Rwanda" fetchpriority="high" decoding="async">
                     <div class="services-hero-overlay" aria-hidden="true"></div>
                     <div class="services-hero-caption"><span>Insight from the ground up</span><small>GECO Africa · Since 2007</small></div>
                     <div class="services-hero-count"><strong>04</strong><span>Connected service areas</span></div>
@@ -42,7 +42,7 @@
             <section class="service-detail-section" id="{{ $service['slug'] }}">
                 <div class="site-container service-detail-grid @if ($loop->even) service-detail-reverse @endif">
                     <figure class="service-detail-visual">
-                        <img src="{{ asset($service['image']) }}" width="1600" height="900" alt="{{ $service['imageAlt'] }}" @if (!$loop->first) loading="lazy" @endif>
+                        <img src="{{ asset($service['image']) }}" width="1600" height="900" alt="{{ $service['imageAlt'] }}" loading="lazy" decoding="async">
                         <figcaption><span>{{ $service['imageCaption'] }}</span><span class="service-figure-number">{{ $service['number'] }}</span></figcaption>
                     </figure>
 

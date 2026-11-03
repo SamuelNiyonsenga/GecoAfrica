@@ -15,12 +15,6 @@
                     <p>Share a project brief, ask about our services or reach the GECO Africa team directly. We’ll help you find the right next step.</p>
                     <a class="button button-dark" href="#contact-form">Send a project enquiry <span aria-hidden="true">↓</span></a>
                 </div>
-                <aside class="contact-hero-card" aria-label="Quick contact details">
-                    <span class="contact-hero-card-label">Talk to our team</span>
-                    <a href="tel:+250788842990"><small>Call us</small><strong>+250 788 842 990</strong><span aria-hidden="true">↗</span></a>
-                    <a href="mailto:info@gecoafrica.com"><small>Email us</small><strong>info@gecoafrica.com</strong><span aria-hidden="true">↗</span></a>
-                    <p>Engineering and project enquiries are welcome.</p>
-                </aside>
             </div>
         </div>
     </section>
@@ -36,20 +30,19 @@
                     </div>
 
                     @if (session('contact_success'))
-                        <div class="contact-alert contact-alert-success" role="status">{{ session('contact_success') }}</div>
-                    @endif
-
+                        <div class="contact-success-panel" role="status" tabindex="-1">
+                            <p class="eyebrow"><span class="eyebrow-line"></span> Enquiry received</p>
+                            <h3>Thank you for getting in touch.</h3>
+                            <p>{{ session('contact_success') }}</p>
+                            <a class="text-link" href="{{ route('home') }}">Return to the homepage <span aria-hidden="true">→</span></a>
+                        </div>
+                    @else
                     @if ($errors->any())
-                        <div class="contact-alert contact-alert-error" role="alert">
+                        <div class="contact-alert contact-alert-error" role="alert" tabindex="-1">
                             <strong>Please review the highlighted fields.</strong>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                            <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                         </div>
                     @endif
-
                     <form action="{{ route('contact.submit') }}" method="POST" class="contact-form">
                         @csrf
                         <div class="contact-honeypot" aria-hidden="true">
@@ -78,7 +71,7 @@
                             </div>
                             <div class="contact-field">
                                 <label for="contact-service">What can we help with?</label>
-                                <select id="contact-service" name="service">
+                                <select id="contact-service" name="service" @error('service') aria-invalid="true" aria-describedby="service-error" @enderror>
                                     <option value="">Choose a service (optional)</option>
                                     <option value="general" @selected(old('service') === 'general')>General enquiry</option>
                                     <option value="geotechnical" @selected(old('service') === 'geotechnical')>Geotechnical investigation</option>
@@ -87,6 +80,7 @@
                                     <option value="design" @selected(old('service') === 'design')>Engineering design and supervision</option>
                                     <option value="other" @selected(old('service') === 'other')>Other project or service</option>
                                 </select>
+                                @error('service')<span class="contact-field-error" id="service-error">{{ $message }}</span>@enderror
                             </div>
                         </div>
 
@@ -101,6 +95,7 @@
                             <button class="button button-dark" type="submit">Send enquiry <span aria-hidden="true">↗</span></button>
                         </div>
                     </form>
+                    @endif
                 </section>
 
                 <aside class="contact-details-column">
@@ -130,8 +125,11 @@
 
                     <section class="contact-map-card" aria-label="Find the GECO Africa office">
                         <div class="contact-map-heading"><div><span>Find our office</span><strong>Kigali, Rwanda</strong></div><span aria-hidden="true">↗</span></div>
-                        <iframe title="Map showing GECO Africa Ltd in Kigali, Rwanda" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d878.3757565389417!2d30.071269112158337!3d-1.943092727490683!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca74efc5b9d37%3A0xdc599965e0a07fe5!2sGECO%20Africa%20LTD!5e1!3m2!1sen!2srw!4v1571048510158!5m2!1sen!2srw" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                        <a href="https://www.google.com/maps/search/?api=1&amp;query=GECO+Africa+LTD+Kigali" target="_blank" rel="noopener noreferrer">Open directions in Google Maps <span aria-hidden="true">↗</span></a>
+                        <div class="contact-map-slot" data-contact-map-slot><p>Avenue des Poids Lourds, Kigali, Rwanda</p><button type="button" data-contact-load-map>Load interactive map</button></div>
+                        <div class="contact-map-actions">
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query=GECO+Africa+LTD+Kigali" target="_blank" rel="noopener noreferrer">Open in Google Maps <span aria-hidden="true">↗</span></a>
+                            <a href="https://www.google.com/maps/dir/?api=1&amp;destination=GECO+Africa+LTD+Kigali" target="_blank" rel="noopener noreferrer">Get directions <span aria-hidden="true">↗</span></a>
+                        </div>
                     </section>
                 </aside>
             </div>

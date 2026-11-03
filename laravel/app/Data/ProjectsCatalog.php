@@ -20,7 +20,7 @@ final class ProjectsCatalog
                 'title' => 'Asphalt roads in Rusizi',
                 'location' => 'Rusizi District, Western Province',
                 'category' => 'Roads & transport',
-                'summary' => 'Construction supervision for asphalt roads in Rusizi District. The reference schedule records a 4.94 km assignment.',
+                'summary' => 'Construction supervision for 4.94 km of asphalt roads in Rusizi District.',
                 'image' => 'images/projects/rusizi-asphalt-road.jpg',
                 'imageAlt' => 'Completed asphalt road with pedestrian crossing in Rwanda',
                 'number' => '02',
@@ -31,7 +31,7 @@ final class ProjectsCatalog
                 'category' => 'Buildings & facilities',
                 'summary' => 'Renovation of the MINECOFIN archive library into a transformer housing facility.',
                 'image' => 'images/projects/minecofin-transformer-facility.jpg',
-                'imageAlt' => 'Renovated transformer housing facility at the former MINECOFIN archive library',
+                'imageAlt' => 'Renovated transformer housing facility at the MINECOFIN archive library',
                 'number' => '03',
             ],
             [
@@ -42,7 +42,7 @@ final class ProjectsCatalog
                 'image' => 'images/projects/lwh-soil-investigation.jpg',
                 'imageAlt' => 'Soil sampling equipment used for a land husbandry investigation in Rwanda',
                 'number' => '04',
-                'areaNote' => 'The former project gallery lists 500 ha in Nyanza and 100 ha in Gatsibo. The references schedule separately records a 25 ha soil-analysis assignment for Nyanza and Gatsibo. The published source materials do not explain the difference, so both figures are retained as originally recorded.',
+                'areaNote' => 'Project information includes area figures of 500 ha in Nyanza and 100 ha in Gatsibo, alongside a separate 25 ha soil-analysis assignment for Nyanza and Gatsibo. The relationship between these figures is not specified.',
             ],
         ];
     }
@@ -67,7 +67,7 @@ final class ProjectsCatalog
                     ['title' => 'Geotechnical investigations for a nine-storey building for Rwanda Union Mission Adventist Church', 'location' => 'Rwanda', 'client' => 'Rwanda Union Mission'],
                     ['title' => 'Geotechnical investigations for the Kayonza warehouse', 'location' => 'Kayonza, Rwanda', 'client' => 'RDF'],
                     ['title' => 'Geotechnical investigations for the Mwange hydropower plant', 'location' => 'Rwanda', 'client' => 'REGREPOWER'],
-                    ['title' => 'Geotechnical investigations for an office building in Kacyiru (listed as “9 office building” in the original schedule)', 'location' => 'Kacyiru, Kigali', 'client' => 'CIECONS Ltd'],
+                    ['title' => 'Geotechnical investigations for an office building in Kacyiru', 'location' => 'Kacyiru, Kigali', 'client' => 'CIECONS Ltd'],
                     ['title' => 'Geotechnical investigations for the 13-storey MIC Commercial Complex', 'location' => 'Muhima, Kigali', 'client' => 'CIECONS Ltd'],
                     ['title' => 'Geotechnical investigations for CHIC Commercial Complex (five storeys)', 'location' => 'Nyarugenge, Kigali', 'client' => 'CIECONS Ltd'],
                     ['title' => 'Geotechnical investigations for Everlasting commercial building, Phase I (five storeys)', 'location' => 'Nyarugenge, Kigali', 'client' => 'Everlasting Ltd'],
