@@ -29,15 +29,22 @@
     @stack('head')
 </head>
 <body>
+    @php
+        $siteSettings = $cmsSiteSettings ?? [];
+        $sitePhones = is_array($siteSettings['phone_numbers'] ?? null) ? array_values($siteSettings['phone_numbers']) : [];
+        $primaryPhone = $sitePhones[0] ?? '+250 788 842 990';
+        $secondaryPhone = $sitePhones[1] ?? '+250 788 572 346';
+        $publicEmail = $siteSettings['public_email'] ?? 'info@gecoafrica.com';
+    @endphp
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     <div class="utility-bar">
         <div class="site-container utility-inner">
-            <p><span class="utility-dot" aria-hidden="true"></span> Engineering the foundations of progress</p>
+            <p><span class="utility-dot" aria-hidden="true"></span> {{ $siteSettings['tagline'] ?? 'Engineering the foundations of progress' }}</p>
             <div class="utility-links">
-                <a href="mailto:info@gecoafrica.com">info@gecoafrica.com</a>
+                <a href="mailto:{{ $publicEmail }}">{{ $publicEmail }}</a>
                 <span aria-hidden="true">/</span>
-                <a href="tel:+250788842990">+250 788 842 990</a>
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a>
             </div>
         </div>
     </div>
@@ -53,6 +60,7 @@
             </button>
 
             <nav class="primary-navigation" id="primary-navigation" aria-label="Main navigation">
+                <a href="{{ route('home') }}" @class(['nav-current' => request()->routeIs('home')]) @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
                 <a href="{{ route('about') }}" @class(['nav-current' => request()->routeIs('about')]) @if(request()->routeIs('about')) aria-current="page" @endif>About</a>
                 <a href="{{ route('services') }}" @class(['nav-current' => request()->routeIs('services')]) @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
                 <a href="{{ route('projects') }}" @class(['nav-current' => request()->routeIs('projects')]) @if(request()->routeIs('projects')) aria-current="page" @endif>Projects</a>
@@ -63,7 +71,7 @@
                 <a href="{{ route('partners') }}" @class(['nav-current' => request()->routeIs('partners')]) @if(request()->routeIs('partners')) aria-current="page" @endif>Partners</a>
                 <a href="{{ route('home') }}#experience">Experience</a>
                 <a href="{{ route('contact') }}" @class(['nav-current' => request()->routeIs('contact')]) @if(request()->routeIs('contact')) aria-current="page" @endif>Contact</a>
-                <a class="nav-cta" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
+                <a class="nav-cta" href="mailto:{{ $publicEmail }}?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
             </nav>
         </div>
     </header>
@@ -93,14 +101,14 @@
             <div class="footer-column footer-contact">
                 <span class="footer-label">Get in touch</span>
                 <a href="{{ route('contact') }}">Contact page</a>
-                <a href="mailto:info@gecoafrica.com">info@gecoafrica.com</a>
-                <a href="tel:+250788842990">+250 788 842 990</a>
-                <a href="tel:+250788572346">+250 788 572 346</a>
-                <span>Avenue des Poids Lourds<br>Source Oil Petrol Station building<br>P.O. Box 3711, Kigali, Rwanda</span>
+                <a href="mailto:{{ $publicEmail }}">{{ $publicEmail }}</a>
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a>
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $secondaryPhone) }}">{{ $secondaryPhone }}</a>
+                <span>{{ $siteSettings['address'] ?? 'Avenue des Poids Lourds, Source Oil Petrol Station building' }}<br>P.O. Box {{ $siteSettings['po_box'] ?? '3711' }}, {{ $siteSettings['city'] ?? 'Kigali' }}, {{ $siteSettings['country'] ?? 'Rwanda' }}</span>
             </div>
         </div>
         <div class="site-container footer-bottom">
-            <span>© {{ date('Y') }} GECO Africa Ltd. All rights reserved.</span>
+            <span>© {{ date('Y') }} {{ $siteSettings['business_name'] ?? 'GECO Africa Ltd' }}. All rights reserved.</span>
             <span>Engineering &amp; construction consultancy · Rwanda</span>
         </div>
     </footer>

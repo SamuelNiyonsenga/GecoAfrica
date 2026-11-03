@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\ProjectsCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class ProjectsController extends Controller
 {
     public function index(): View
     {
-        $groups = ProjectsCatalog::groups();
+        $groups = CmsContentRepository::projectGroups();
         $items = [];
 
         foreach ($groups as $group) {
@@ -42,14 +42,14 @@ class ProjectsController extends Controller
                 'description' => 'A selection of GECO Africa’s engineering project references in Rwanda and the region.',
                 'mainEntity' => [
                     '@type' => 'ItemList',
-                    'numberOfItems' => ProjectsCatalog::referenceCount(),
+                    'numberOfItems' => CmsContentRepository::referenceCount(),
                     'itemListElement' => $items,
                 ],
             ],
-            'featuredProjects' => ProjectsCatalog::featured(),
+            'featuredProjects' => CmsContentRepository::featuredProjects(),
             'projectGroups' => $groups,
-            'selectedExperience' => ProjectsCatalog::selectedExperience(),
-            'referenceCount' => ProjectsCatalog::referenceCount(),
+            'selectedExperience' => CmsContentRepository::selectedExperience(),
+            'referenceCount' => CmsContentRepository::referenceCount(),
         ]);
     }
 }

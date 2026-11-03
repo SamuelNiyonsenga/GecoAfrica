@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\InsightsCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -11,19 +11,19 @@ class BlogController extends Controller
     public function index(Request $request): View
     {
         $category = (string) $request->query('category', 'all');
-        $categories = InsightsCatalog::categories();
+        $categories = CmsContentRepository::blogCategories();
 
         if (! array_key_exists($category, $categories)) {
             $category = 'all';
         }
 
         $articles = array_values(array_filter(
-            InsightsCatalog::all(),
+            CmsContentRepository::blog(),
             static fn (array $article): bool => $category === 'all' || $article['categorySlug'] === $category,
         ));
         $categoryCounts = array_fill_keys(array_keys($categories), 0);
-        $categoryCounts['all'] = count(InsightsCatalog::all());
-        foreach (InsightsCatalog::all() as $article) {
+        $categoryCounts['all'] = count(CmsContentRepository::blog());
+        foreach (CmsContentRepository::blog() as $article) {
             $categoryCounts[$article['categorySlug']]++;
         }
 
@@ -67,12 +67,12 @@ class BlogController extends Controller
 
     public function show(string $slug): View
     {
-        $article = InsightsCatalog::find($slug);
+        $article = CmsContentRepository::findBlog($slug);
 
         abort_if($article === null, 404);
 
         $related = array_values(array_filter(
-            InsightsCatalog::all(),
+            CmsContentRepository::blog(),
             static fn (array $item): bool => $item['slug'] !== $article['slug'],
         ));
 

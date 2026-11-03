@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\ActivitiesCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class ActivitiesController extends Controller
 {
     public function index(): View
     {
-        $activities = ActivitiesCatalog::all();
+        $activities = CmsContentRepository::activities();
         $activityItems = array_map(static fn (array $activity, int $index): array => [
             '@type' => 'ListItem',
             'position' => $index + 1,

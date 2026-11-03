@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\GalleryCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class GalleryController extends Controller
 {
     public function index(): View
     {
-        $photos = GalleryCatalog::all();
-        $filters = GalleryCatalog::categories();
+        $photos = CmsContentRepository::gallery();
+        $filters = CmsContentRepository::galleryCategories();
 
         foreach ($filters as &$filter) {
             $filter['count'] = count(array_filter($photos, static fn (array $photo): bool => $photo['category'] === $filter['id']));

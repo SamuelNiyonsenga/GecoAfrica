@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\PartnersCatalog;
+use App\Support\CmsContentRepository;
 use Illuminate\View\View;
 
 class PartnersController extends Controller
 {
     public function index(): View
     {
-        $partners = PartnersCatalog::all();
+        $partners = CmsContentRepository::partners();
         $items = array_map(static fn (array $partner, int $index): array => [
             '@type' => 'ListItem',
             'position' => $index + 1,
