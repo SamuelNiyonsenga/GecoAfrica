@@ -26,19 +26,7 @@ class PartnersController extends Controller
             'pageDescription' => 'Explore the five organizations listed on GECO Africa’s previous partner page, with current organization details and verified official websites.',
             'canonicalUrl' => 'https://gecoafrica.com/partners/',
             'ogImage' => 'https://gecoafrica.com/images/partners/rwanda-standards-board.jpg',
-            'ogImageAlt' => 'Rwanda Standards Board logo from GECO Africa’s former partner directory',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'Partners | GECO Africa',
-                'url' => 'https://gecoafrica.com/partners/',
-                'description' => 'Organizations listed on GECO Africa’s previous partner page.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($partners),
-                    'itemListElement' => $items,
-                ],
-            ],
+            'ogImageAlt' => 'Rwanda Standards Board logo',
             'partners' => $partners,
         ]);
     }

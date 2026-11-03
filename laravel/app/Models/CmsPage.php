@@ -24,6 +24,9 @@ class CmsPage extends Model
     public function publishedFields(?string $locale = null): array
     {
         $translation = $this->translationFor($locale);
+        if (app(\App\Support\CmsPreview::class)->pageKey() === $this->page_key) {
+            return $translation?->draft_fields ?? [];
+        }
         return $translation?->published_fields ?? [];
     }
 

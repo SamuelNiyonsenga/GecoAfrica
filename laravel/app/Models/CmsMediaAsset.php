@@ -12,7 +12,7 @@ class CmsMediaAsset extends Model
     use SoftDeletes;
 
     protected $table = 'cms_media_assets';
-    protected $fillable = ['disk', 'path', 'original_name', 'mime_type', 'size_bytes', 'width', 'height', 'duration_seconds', 'uploaded_by'];
+    protected $fillable = ['disk', 'path', 'original_name', 'alt_text', 'mime_type', 'size_bytes', 'width', 'height', 'duration_seconds', 'uploaded_by'];
     protected function casts(): array
     {
         return ['size_bytes' => 'integer', 'width' => 'integer', 'height' => 'integer', 'duration_seconds' => 'integer'];

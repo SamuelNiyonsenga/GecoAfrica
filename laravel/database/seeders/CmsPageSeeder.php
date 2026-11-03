@@ -21,35 +21,7 @@ class CmsPageSeeder extends Seeder
 {
     public function run(): void
     {
-        $homeFields = app(HomeController::class)->index()->getData();
-        unset($homeFields['services'], $homeFields['featuredProjects'], $homeFields['projectReferenceCount'], $homeFields['cmsSiteSettings']);
-        $this->page('home', $homeFields);
-
-        $aboutFields = app(AboutController::class)->index()->getData();
-        unset($aboutFields['serviceScopes'], $aboutFields['team'], $aboutFields['cmsSiteSettings']);
-        $this->page('about', $aboutFields);
-
-        $contactFields = app(ContactController::class)->index()->getData();
-        unset($contactFields['cmsSiteSettings']);
-        $this->page('contact', $contactFields);
-
-        $pages = [
-            'services' => [ServicesController::class, ['services']],
-            'projects' => [ProjectsController::class, ['featuredProjects', 'projectGroups', 'referenceCount']],
-            'team' => [TeamController::class, ['coreTeam', 'supportingTeam', 'teamCount']],
-            'partners' => [PartnersController::class, ['partners']],
-            'gallery' => [GalleryController::class, ['photos', 'galleryFilters']],
-            'blog' => [BlogController::class, ['articles', 'categories', 'categoryCounts', 'activeCategory']],
-            'activities' => [ActivitiesController::class, ['activities', 'categories']],
-        ];
-        foreach ($pages as $key => [$controller, $dynamic]) {
-            $instance = app($controller);
-            $pageView = $controller === BlogController::class
-                ? $instance->index(Request::create('/blog', 'GET'))
-                : $instance->index();
-            $fields = $pageView->getData();
-            foreach ($dynamic as $field) unset($fields[$field]);
-            unset($fields['cmsSiteSettings']);
+        foreach ($this->pageDefaults() as $key => $fields) {
             $this->page($key, $fields);
         }
 
@@ -68,6 +40,45 @@ class CmsPageSeeder extends Seeder
             'default_locale' => 'en',
             'enabled_locales' => ['en'],
         ]]);
+    }
+
+    /** @return array<string, array<string, mixed>> */
+    public function pageDefaults(): array
+    {
+        $pages = [];
+        $homeFields = app(HomeController::class)->index()->getData();
+        unset($homeFields['services'], $homeFields['featuredProjects'], $homeFields['projectReferenceCount'], $homeFields['cmsSiteSettings'], $homeFields['structuredData']);
+        $pages['home'] = $homeFields;
+
+        $aboutFields = app(AboutController::class)->index()->getData();
+        unset($aboutFields['serviceScopes'], $aboutFields['team'], $aboutFields['cmsSiteSettings'], $aboutFields['structuredData']);
+        $pages['about'] = $aboutFields;
+
+        $contactFields = app(ContactController::class)->index()->getData();
+        unset($contactFields['cmsSiteSettings'], $contactFields['structuredData']);
+        $pages['contact'] = $contactFields;
+
+        $dynamicPages = [
+            'services' => [ServicesController::class, ['services']],
+            'projects' => [ProjectsController::class, ['featuredProjects', 'projectGroups', 'referenceCount']],
+            'team' => [TeamController::class, ['coreTeam', 'supportingTeam', 'teamCount']],
+            'partners' => [PartnersController::class, ['partners']],
+            'gallery' => [GalleryController::class, ['photos', 'galleryFilters']],
+            'blog' => [BlogController::class, ['articles', 'categories', 'categoryCounts', 'activeCategory']],
+            'activities' => [ActivitiesController::class, ['activities', 'categories']],
+        ];
+        foreach ($dynamicPages as $key => [$controller, $dynamic]) {
+            $instance = app($controller);
+            $pageView = $controller === BlogController::class
+                ? $instance->index(Request::create('/blog', 'GET'))
+                : $instance->index();
+            $fields = $pageView->getData();
+            foreach ($dynamic as $field) unset($fields[$field]);
+            unset($fields['cmsSiteSettings'], $fields['structuredData']);
+            $pages[$key] = $fields;
+        }
+
+        return $pages;
     }
 
     private function page(string $key, array $fields): void

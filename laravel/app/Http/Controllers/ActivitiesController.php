@@ -14,27 +14,15 @@ class ActivitiesController extends Controller
             '@type' => 'ListItem',
             'position' => $index + 1,
             'name' => $activity['title'],
-            'url' => 'https://gecoafrica.com/activities/#activity-'.$activity['id'],
+            'url' => 'https://gecoafrica.com/activities/#activity-'.($activity['id'] ?? $activity['slug'] ?? ''),
         ], $activities, array_keys($activities));
 
         return view('activities', [
             'pageTitle' => 'GECO Africa Activities | Engineering Assignments in Rwanda',
-            'pageDescription' => 'Explore GECO Africa’s published activity record: geotechnical investigations, topographic surveys, water supply engineering, structural assessments and project services delivered across Rwanda.',
+            'pageDescription' => 'Explore GECO Africa engineering assignments, including geotechnical investigations, topographic surveys, water supply engineering, structural assessments and project services across Rwanda.',
             'canonicalUrl' => 'https://gecoafrica.com/activities/',
             'ogImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
             'ogImageAlt' => 'GECO Africa engineering team working on a site investigation in Rwanda',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'GECO Africa activities and engineering assignments',
-                'url' => 'https://gecoafrica.com/activities/',
-                'description' => 'A record of GECO Africa engineering assignments published on its former activities page.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($activities),
-                    'itemListElement' => $activityItems,
-                ],
-            ],
             'activities' => $activities,
             'categories' => array_values(array_unique(array_column($activities, 'category'))),
         ]);

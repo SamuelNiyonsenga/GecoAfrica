@@ -15,20 +15,20 @@
                     <p class="projects-hero-intro">From what lies beneath the ground to the roads, buildings and public facilities people rely on, GECO’s project references span a wide range of engineering challenges.</p>
                     <div class="hero-actions">
                         <a class="button button-dark" href="#featured-projects">Explore selected work <span aria-hidden="true">↓</span></a>
-                        <a class="text-link" href="{{ asset('assets/our-references.pdf') }}" target="_blank" rel="noopener">Open reference schedule <span aria-hidden="true">↗</span></a>
+                        <a class="text-link" href="{{ asset('assets/our-references.pdf') }}" target="_blank" rel="noopener">Download project reference list (PDF) <span aria-hidden="true">↗</span></a>
                     </div>
                 </div>
 
                 <div class="projects-hero-visual">
-                    <img src="{{ asset('images/projects/nyanza-asphalt-road.jpg') }}" width="540" height="304" fetchpriority="high" alt="Asphalt road construction in Nyanza District, Rwanda">
+                    <img src="{{ asset('images/projects/nyanza-asphalt-road.jpg') }}" width="540" height="304" fetchpriority="high" decoding="async" alt="Asphalt road construction in Nyanza District, Rwanda">
                     <div class="projects-photo-caption"><span>Infrastructure for connected communities</span><small>Road construction supervision · Rwanda</small></div>
                 </div>
             </div>
 
             <div class="projects-metrics" aria-label="GECO Africa project experience">
-                <div><strong>{{ $referenceCount }}</strong><span>Project references<br>in the published schedule</span></div>
-                <div><strong>100<span>+</span></strong><span>Successful projects<br>reported on the former site</span></div>
-                <div><strong>500<span>+</span></strong><span>Customers served<br>reported on the former site</span></div>
+                <div><strong>{{ $referenceCount }}</strong><span>Project references</span></div>
+                <div><strong>100<span>+</span></strong><span>Successful projects</span></div>
+                <div><strong>500<span>+</span></strong><span>Customers served</span></div>
                 <div><strong>2007</strong><span>Engineering practice<br>founded in Rwanda</span></div>
             </div>
         </div>
@@ -41,26 +41,28 @@
                     <p class="eyebrow"><span class="eyebrow-line"></span> In the field</p>
                     <h2>Selected project <em>stories.</em></h2>
                 </div>
-                <p class="heading-aside">These illustrated examples and descriptions are carried over from GECO’s former website and reference materials.</p>
+                <p class="heading-aside">Explore selected GECO Africa projects and the engineering work behind them.</p>
             </div>
 
             <div class="featured-project-grid">
                 @foreach ($featuredProjects as $project)
                     <article class="featured-project-card">
                         <div class="featured-project-image">
-                            <img src="{{ asset($project['image']) }}" width="1200" height="675" loading="lazy" alt="{{ $project['imageAlt'] }}">
+                            <img src="{{ asset($project['image']) }}" width="1200" height="900" loading="lazy" decoding="async" alt="{{ $project['imageAlt'] }}">
                             <span class="featured-project-number">{{ $project['number'] }}</span>
                         </div>
                         <div class="featured-project-body">
-                            <p class="featured-project-category">{{ $project['category'] }} <span aria-hidden="true">·</span> {{ $project['location'] }}</p>
+                            <p class="featured-project-category">{{ $project['category'] }}</p>
+                            <p class="featured-project-location">{{ $project['location'] }}</p>
                             <h3>{{ $project['title'] }}</h3>
                             <p>{{ $project['summary'] }}</p>
-                            @isset($project['areaNote'])
+                            @if(!empty($project['areaNote']))
                                 <details class="project-source-note">
                                     <summary>About the published area figures</summary>
                                     <p>{{ $project['areaNote'] }}</p>
                                 </details>
-                            @endisset
+                            @endif
+                            <a class="featured-project-action" href="#project-references">Explore project references <span aria-hidden="true">↗</span></a>
                         </div>
                     </article>
                 @endforeach
@@ -76,9 +78,15 @@
                     <h2>49 references. <em>Three disciplines.</em></h2>
                 </div>
                 <div class="project-directory-aside">
-                    <p>Browse the full project schedule from GECO’s former website. The original PDF is also available to open or download.</p>
-                    <a class="button button-bright" href="{{ asset('assets/our-references.pdf') }}" target="_blank" rel="noopener">View original reference PDF <span aria-hidden="true">↗</span></a>
+                    <p>Browse GECO Africa’s project references, or download the project reference list.</p>
+                    <a class="button button-bright" href="{{ asset('assets/our-references.pdf') }}" target="_blank" rel="noopener">Download project reference list (PDF) <span aria-hidden="true">↗</span></a>
                 </div>
+            </div>
+
+            <div class="project-search" role="search">
+                <label for="project-search-input">Search project references</label>
+                <div><input id="project-search-input" type="search" data-project-search placeholder="Search title, location or client" autocomplete="off"><button type="button" data-project-clear hidden>Clear</button></div>
+                <p data-project-results aria-live="polite">{{ $referenceCount }} project references</p>
             </div>
 
             <nav class="project-category-nav" aria-label="Project reference categories">
@@ -99,13 +107,13 @@
                     </div>
                     <ol class="project-reference-list">
                         @foreach ($group['projects'] as $project)
-                            <li>
+                            <li data-project-item data-project-search-text="{{ mb_strtolower($project['title'].' '.$project['location'].' '.$project['client']) }}">
                                 <article class="project-reference-card">
                                     <span class="reference-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                                     <div>
                                         <h4>{{ $project['title'] }}</h4>
-                                        <p><span>Location</span>{{ $project['location'] }}</p>
-                                        <p><span>Client</span>{{ $project['client'] }}</p>
+                                        @if (($project['location'] ?? '') !== '')<p><span>Location</span>{{ $project['location'] }}</p>@endif
+                                        @if (($project['client'] ?? '') !== '')<p><span>Client</span>{{ $project['client'] }}</p>@endif
                                     </div>
                                 </article>
                             </li>
@@ -113,6 +121,7 @@
                     </ol>
                 </section>
             @endforeach
+            <p class="project-search-empty" data-project-empty hidden>No projects match your search.</p>
         </div>
     </section>
 
@@ -131,7 +140,7 @@
             </ul>
             <aside class="projects-investment-note">
                 <span>Wider company activity</span>
-                <p>GECO’s former project profile also records investment in apartments and quarrying, describing a wider interest in areas of public importance, skills and shared human values.</p>
+                <p>GECO Africa’s company profile describes investment in apartments and quarrying, areas connected with public importance, skills and shared human values.</p>
             </aside>
         </div>
     </section>
@@ -144,8 +153,8 @@
             </div>
             <div>
                 <p>Talk with our team about a site, road, building or infrastructure challenge.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Discuss your project <span aria-hidden="true">↗</span></a>
-                <a class="projects-contact-phone" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Discuss your project <span aria-hidden="true">↗</span></a>
+                <a class="projects-contact-phone" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

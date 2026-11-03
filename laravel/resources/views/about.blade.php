@@ -15,12 +15,12 @@
                     <p class="about-hero-intro">GECO Africa Ltd is a civil engineering consultancy and construction company established in 2007 and registered as GECO Africa Ltd in 2009. We bring local knowledge and technical expertise to the infrastructure that connects communities and supports growth.</p>
                     <div class="hero-actions">
                         <a class="button button-dark" href="#our-story">Discover our story <span aria-hidden="true">↓</span></a>
-                        <a class="text-link" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Discuss a project <span aria-hidden="true">→</span></a>
+                        <a class="text-link" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Discuss a project <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
 
                 <div class="about-hero-visual">
-                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="GECO Africa field team conducting a geotechnical investigation in Rwanda" fetchpriority="high">
+                    <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="GECO Africa field team conducting a geotechnical investigation in Rwanda" fetchpriority="high" decoding="async">
                     <div class="about-hero-photo-caption"><span>Local knowledge. Lasting infrastructure.</span><small>Geotechnical investigation · Rwanda</small></div>
                     <div class="about-hero-stat"><strong>2007</strong><span>Founded in Rwanda</span></div>
                 </div>
@@ -43,7 +43,7 @@
                 <p>GECO began as an independent engineering practice and grew into a Rwandan-owned civil engineering consultancy serving projects across the country.</p>
                 <div class="about-location-card">
                     <span class="location-pin" aria-hidden="true">⌖</span>
-                    <span><small>Our office</small><strong>Avenue des Poids Lourds<br>Kigali, Rwanda</strong><em>Source Oil Petrol Station building</em></span>
+                    <span><small>Our office</small><strong>{{ $siteAddress }}<br>{{ $siteCity }}, {{ $siteCountry }}</strong><em>{{ $sitePoBox ? 'P.O. Box '.$sitePoBox : '' }}</em></span>
                 </div>
             </div>
 
@@ -143,21 +143,21 @@
                     <p class="eyebrow"><span class="eyebrow-line"></span> The people behind the work</p>
                     <h2>Experienced people.<br><em>One shared purpose.</em></h2>
                 </div>
-                <p class="heading-aside">Meet GECO’s shareholders and professional team. The four original staff CV documents are available to view below.</p>
+                <p class="heading-aside">Meet GECO’s shareholders and professional team. Staff CV documents are available below.</p>
             </div>
 
             <div class="people-grid">
                 @foreach ($team as $person)
                     <article class="person-card">
-                        <div class="person-photo"><img src="{{ asset($person['image']) }}" width="640" height="640" alt="{{ $person['alt'] }}" loading="lazy"></div>
+                        <div class="person-photo"><img src="{{ asset($person['image']) }}" width="288" height="360" alt="{{ $person['alt'] }}" loading="lazy" decoding="async"></div>
                         <div class="person-card-content">
                             <p class="person-role">{{ $person['role'] }}</p>
                             <h3>{{ $person['name'] }}</h3>
                             <p class="person-bio">{{ $person['bio'] }}</p>
-                            @isset($person['profile'])
+                            @if(!empty($person['profile']))
                                 <p class="person-profile"><span>Profile</span>{{ $person['profile'] }}</p>
-                            @endisset
-                            <a class="person-cv-link" href="{{ asset($person['cv']) }}" target="_blank" rel="noopener">View original CV (PDF) <span aria-hidden="true">↗</span></a>
+                            @endif
+                            <a class="person-cv-link" href="{{ asset($person['cv']) }}" target="_blank" rel="noopener">View CV (PDF) <span aria-hidden="true">↗</span></a>
                         </div>
                     </article>
                 @endforeach
@@ -180,8 +180,8 @@
     <section class="about-contact-strip">
         <div class="site-container about-contact-inner">
             <p>Planning a project in Rwanda?</p>
-            <a href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
-            <span>+250 788 842 990</span>
+            <a href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
+            <span>{{ $sitePrimaryPhone }}</span>
         </div>
     </section>
 </main>

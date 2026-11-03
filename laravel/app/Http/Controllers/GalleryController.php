@@ -16,6 +16,7 @@ class GalleryController extends Controller
             $filter['count'] = count(array_filter($photos, static fn (array $photo): bool => $photo['category'] === $filter['id']));
         }
         unset($filter);
+        array_unshift($filters, ['id' => 'all', 'label' => 'All', 'count' => count($photos)]);
 
         $items = array_map(static fn (array $photo, int $index): array => [
             '@type' => 'ListItem',
@@ -36,18 +37,6 @@ class GalleryController extends Controller
             'ogImage' => 'https://gecoafrica.com/images/gallery/bg_13.jpg',
             'ogImageAlt' => 'GECO Africa drilling and geotechnical fieldwork in Rwanda',
             'preloadImage' => 'https://gecoafrica.com/images/gallery/bg_13.jpg',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'Photo Gallery | GECO Africa',
-                'url' => 'https://gecoafrica.com/gallery/',
-                'description' => 'Photos of GECO Africa’s engineering projects, site work and laboratory activities.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($photos),
-                    'itemListElement' => $items,
-                ],
-            ],
             'photos' => $photos,
             'galleryFilters' => $filters,
         ]);

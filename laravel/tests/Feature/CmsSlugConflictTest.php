@@ -16,7 +16,7 @@ class CmsSlugConflictTest extends TestCase
     {
         parent::setUp();
 
-        DB::table('cms_locales')->insert([
+        DB::table('cms_locales')->insertOrIgnore([
             'code' => 'en',
             'name' => 'English',
             'is_enabled' => true,

@@ -15,7 +15,7 @@
                 <div class="insight-article-byline"><span>{{ $article['category'] }}</span><i aria-hidden="true"></i><span>{{ $article['readTime'] }}</span><span class="insight-byline-company">GECO Africa · Engineering guide</span></div>
             </div>
             <figure class="insight-article-cover">
-                <img src="{{ asset($article['image']) }}" width="1600" height="900" alt="{{ $article['imageAlt'] }}" fetchpriority="high">
+                <img src="{{ asset($article['image']) }}" width="1600" height="900" alt="{{ $article['imageAlt'] }}" fetchpriority="high" decoding="async">
                 <figcaption><span>{{ $article['imageAlt'] }}</span><span>GECO Africa · Rwanda</span></figcaption>
             </figure>
         </div>
@@ -27,13 +27,15 @@
                 <span class="insight-aside-label">In this guide</span>
                 <nav aria-label="Article contents">
                     @foreach ($article['sections'] as $section)
-                        <a href="#guide-section-{{ $loop->iteration }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $section['heading'] }}</a>
+                        <a href="#guide-section-{{ $loop->iteration }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $section['heading'] ?? '' }}</a>
                     @endforeach
                 </nav>
+                @if ($article['serviceAnchor'] !== '' && $article['serviceLabel'] !== '')
                 <div class="insight-aside-related">
                     <span class="insight-aside-label">Related service</span>
                     <a href="{{ route('services') }}#{{ $article['serviceAnchor'] }}">{{ $article['serviceLabel'] }} <span aria-hidden="true">↗</span></a>
                 </div>
+                @endif
             </aside>
 
             <article class="insight-article-body">
@@ -41,8 +43,8 @@
                     <section id="guide-section-{{ $loop->iteration }}" class="insight-content-section">
                         <span class="insight-section-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                         <div>
-                            <h2>{{ $section['heading'] }}</h2>
-                            @foreach ($section['paragraphs'] as $paragraph)
+                            <h2>{{ $section['heading'] ?? '' }}</h2>
+                            @foreach ((array) ($section['paragraphs'] ?? []) as $paragraph)
                                 <p>{{ $paragraph }}</p>
                             @endforeach
                         </div>
@@ -55,6 +57,9 @@
                     <span class="insight-aside-label">Continue exploring</span>
                     <a href="{{ route('projects') }}">Browse GECO project references <span aria-hidden="true">↗</span></a>
                     <a href="{{ route('contact') }}">Discuss a project with our team <span aria-hidden="true">↗</span></a>
+                    @if ($nextArticle)
+                        <a class="insight-next-article" href="{{ route('blog.show', $nextArticle['slug']) }}"><small>Next guide</small>{{ $nextArticle['title'] }} <span aria-hidden="true">→</span></a>
+                    @endif
                 </div>
             </article>
         </div>
@@ -69,7 +74,7 @@
             <div class="insights-related-grid">
                 @foreach ($relatedArticles as $related)
                     <article class="insight-related-card">
-                        <a href="{{ route('blog.show', $related['slug']) }}" class="insight-related-image"><img src="{{ asset($related['image']) }}" width="900" height="506" loading="lazy" alt="{{ $related['imageAlt'] }}"><span aria-hidden="true">↗</span></a>
+                        <a href="{{ route('blog.show', $related['slug']) }}" class="insight-related-image"><img src="{{ asset($related['image']) }}" width="900" height="506" loading="lazy" decoding="async" alt="{{ $related['imageAlt'] }}"><span aria-hidden="true">↗</span></a>
                         <div><p class="insight-card-meta"><span>{{ $related['category'] }}</span><i aria-hidden="true"></i><span>{{ $related['readTime'] }}</span></p><h3><a href="{{ route('blog.show', $related['slug']) }}">{{ $related['title'] }}</a></h3><a class="insight-read-link" href="{{ route('blog.show', $related['slug']) }}">Read the guide <span aria-hidden="true">→</span></a></div>
                     </article>
                 @endforeach

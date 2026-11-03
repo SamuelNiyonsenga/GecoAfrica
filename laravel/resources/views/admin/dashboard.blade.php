@@ -1,18 +1,15 @@
 @extends('layouts.admin')
 @section('title', 'Overview')
 @section('content')
-<header class="page-heading">
-    <div><p class="eyebrow">GECO Africa CMS</p><h1>Welcome, {{ Str::before(auth()->user()->name, ' ') }}</h1><p class="muted">Manage the content and messages on your website.</p></div>
-    <a class="button button-outline" href="{{ route('home') }}" target="_blank" rel="noopener">View website</a>
-</header>
-<section class="stat-grid" aria-label="Content overview">
-    <article class="stat-card"><span>Published content</span><strong>{{ $publishedCount }}</strong></article>
-    <article class="stat-card"><span>Draft content</span><strong>{{ $draftCount }}</strong></article>
-    <article class="stat-card"><span>New enquiries</span><strong>{{ $newEnquiries }}</strong></article>
-    <article class="stat-card"><span>Total content records</span><strong>{{ $contentCount }}</strong></article>
-</section>
-<section class="panel">
-    <div class="panel-heading"><div><p class="eyebrow">Getting started</p><h2>Your website content will appear here</h2></div></div>
-    <p class="muted">The CMS is being connected to GECO Africa’s existing Laravel pages. Your current website remains available while content management is built.</p>
-</section>
+<header class="page-heading"><div><p class="eyebrow">GECO Africa CMS</p><h1>Welcome, {{ Str::before(auth()->user()->name, ' ') }}</h1><p class="muted">Manage website content and enquiries.</p></div></header>
+<section class="stat-grid" aria-label="Content overview"><article class="stat-card"><span>Drafts waiting to be published</span><strong>{{ $draftCount }}</strong></article><article class="stat-card"><span>New enquiries</span><strong>{{ $newEnquiries }}</strong></article></section>
+<div class="dashboard-grid">
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">Inbox</p><h2>New enquiries</h2></div><a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}">View all</a></div>
+@if($enquiries->isEmpty())<p class="empty-state">No new enquiries. New messages will appear here.</p>@else<div class="dashboard-list">@foreach($enquiries as $enquiry)<a class="dashboard-row" href="{{ route('admin.enquiries.index', ['status' => 'new']) }}"><strong>{{ $enquiry->name }}</strong><span>{{ $enquiry->service ?: 'General enquiry' }}</span><time datetime="{{ $enquiry->created_at?->toAtomString() }}">{{ $enquiry->created_at?->diffForHumans() }}</time></a>@endforeach</div>@endif</section>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">Review</p><h2>Drafts waiting to be published</h2></div></div>
+@if($drafts->isEmpty())<p class="empty-state">No drafts are waiting for review.</p>@else<div class="dashboard-list">@foreach($drafts as $draft)@php($section = collect(\App\Support\CmsContentTypes::all())->search(fn($def) => $def['type'] === $draft->type))<a class="dashboard-row" href="{{ $section !== false ? route('admin.content.edit', [$section, $draft]) : route('admin.pages.index') }}"><strong>{{ $draft->translatedFields('en')['title'] ?? $draft->translatedFields('en')['name'] ?? 'Untitled content' }}</strong><span>{{ str($draft->type)->replace('_', ' ')->title() }}</span><time>{{ $draft->updated_at?->diffForHumans() }}</time></a>@endforeach</div>@endif</section>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">History</p><h2>Recent changes</h2></div><a href="{{ route('admin.activity.index') }}">Activity log</a></div>
+@if($recentChanges->isEmpty())<p class="empty-state">Saved and published changes will appear here.</p>@else<div class="dashboard-list">@foreach($recentChanges as $log)<div class="dashboard-row"><strong>{{ $log->user?->name ?? 'Administrator' }} {{ str($log->action)->after('.') ?: 'updated' }}</strong><span>{{ str($log->entity_type)->replace('_', ' ')->title() }} › {{ $log->entity_key }}</span><time>{{ $log->created_at?->diffForHumans() }}</time></div>@endforeach</div>@endif</section>
+<section class="panel"><div class="panel-heading"><div><p class="eyebrow">Shortcuts</p><h2>Quick actions</h2></div></div><div class="quick-actions"><a class="button button-outline" href="{{ route('admin.pages.edit', 'home') }}">Edit homepage</a><a class="button button-outline" href="{{ route('admin.content.create', 'blog') }}">Add blog post</a><a class="button button-outline" href="{{ route('admin.media.index') }}">Upload media</a><a class="button button-outline" href="{{ route('admin.settings.edit') }}">Site settings</a><a class="button button-outline" href="{{ route('home') }}" target="_blank" rel="noopener">View website ↗</a></div></section>
+</div>
 @endsection

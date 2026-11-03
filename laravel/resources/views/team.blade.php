@@ -19,15 +19,15 @@
                     </div>
                 </div>
                 <div class="team-hero-visual">
-                    <img src="{{ asset('images/team/jean-kizito.png') }}" width="640" height="640" alt="GECO Africa founder and Managing Director Jean Kizito Munyarugerero" fetchpriority="high">
+                    <img src="{{ asset('images/team/jean-kizito.png') }}" width="309" height="356" alt="GECO Africa founder and Managing Director Jean Kizito Munyarugerero" fetchpriority="high" decoding="async">
                     <div class="team-hero-caption"><span>Technical leadership</span><small>MUNYARUGERERO Jean Kizito · Founder and Managing Director</small></div>
                 </div>
             </div>
 
             <div class="team-facts" aria-label="GECO Africa team overview">
-                <div><strong>{{ $teamCount }}</strong><span>Professionals and specialists<br>listed in the team profile</span></div>
+                <div><strong>{{ $teamCount }}</strong><span>Professionals and specialists<br>in GECO’s team profiles</span></div>
                 <div><strong>{{ count($coreTeam) }}</strong><span>Core professional profiles<br>with CVs available</span></div>
-                <div><strong>{{ count($supportingTeam) }}</strong><span>Supporting specialists<br>named on the former site</span></div>
+                <div><strong>{{ count($supportingTeam) }}</strong><span>Supporting specialists</span></div>
                 <div><strong>2007</strong><span>GECO’s engineering practice<br>founded in Rwanda</span></div>
             </div>
         </div>
@@ -40,14 +40,14 @@
                     <p class="eyebrow"><span class="eyebrow-line"></span> Professional team</p>
                     <h2>Technical skill. <em>Shared responsibility.</em></h2>
                 </div>
-                <p class="heading-aside">The four professional profiles and CVs published by GECO Africa are available here, together with the specialist areas recorded on the original site.</p>
+                <p class="heading-aside">Explore the professional profiles, CVs and specialist areas available from the GECO Africa team.</p>
             </div>
 
             <div class="team-core-grid">
                 @foreach ($coreTeam as $person)
                     <article class="team-person-card" id="{{ $person['slug'] }}">
                         <div class="team-person-photo">
-                            <img src="{{ asset($person['image']) }}" width="640" height="640" alt="{{ $person['alt'] }}" loading="lazy">
+                            <img src="{{ asset($person['image']) }}" width="288" height="360" alt="{{ $person['alt'] }}" loading="lazy" decoding="async">
                             <span class="team-person-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                         </div>
                         <div class="team-person-content">
@@ -78,7 +78,7 @@
                     <p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> Supporting specialists</p>
                     <h2>Additional expertise. <em>One shared purpose.</em></h2>
                 </div>
-                <p class="team-support-aside">GECO’s former team page also named these supporting professionals. The experience figures are shown as published and may need confirmation before being treated as current.</p>
+                <p class="team-support-aside">Meet the supporting professionals who contribute specialist knowledge to GECO’s work.</p>
             </div>
 
             <div class="team-support-grid">
@@ -113,8 +113,8 @@
             </div>
             <div>
                 <p>Speak with our team about geotechnical investigation, engineering design or project delivery.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Contact our team <span aria-hidden="true">↗</span></a>
-                <a class="team-phone-link" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Contact our team <span aria-hidden="true">↗</span></a>
+                <a class="team-phone-link" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

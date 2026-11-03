@@ -6,7 +6,7 @@ class InsightsCatalog
 {
     /**
      * Practical, evergreen guidance for clients planning engineering work.
-     * These are original editorial guides, not historic articles from the former site.
+     * These are GECO Africa editorial guides created for the current site.
      */
     public static function all(): array
     {

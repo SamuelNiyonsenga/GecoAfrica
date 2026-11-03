@@ -31,13 +31,14 @@ class CmsPageController
         $page = CmsPage::query()->firstOrCreate(['page_key' => $pageKey]);
         $translation = $page->translations()->firstOrCreate(['locale_code' => 'en'], ['draft_fields' => [], 'published_fields' => null]);
         $fields = $translation->draft_fields ?? [];
+        unset($fields['structuredData']);
         $sectionSettings = [];
         if ($pageKey === 'home') {
             foreach (self::HOME_SECTIONS as $key => $label) {
                 $sectionSettings[$key] = array_merge(['label' => $label, 'order' => count($sectionSettings) + 1, 'visible' => true], $fields['homeSections'][$key] ?? []);
             }
         }
-        return view('admin.pages.edit', ['page' => $page, 'translation' => $translation, 'label' => self::PAGES[$pageKey], 'sectionSettings' => $sectionSettings, 'versions' => CmsContentVersion::query()->where('entity_type', 'page')->where('entity_key', $pageKey)->latest('created_at')->limit(30)->get()]);
+        return view('admin.pages.edit', ['page' => $page, 'translation' => $translation, 'label' => self::PAGES[$pageKey], 'sectionSettings' => $sectionSettings, 'fieldGroups' => \App\Support\CmsPageFields::grouped($fields), 'versions' => CmsContentVersion::query()->where('entity_type', 'page')->where('entity_key', $pageKey)->latest('created_at')->limit(30)->get()]);
     }
 
     public function saveDraft(Request $request, string $pageKey): RedirectResponse
@@ -51,6 +52,7 @@ class CmsPageController
         $translation->fill(['draft_fields' => $fields])->save();
         $page->update(['updated_by' => $request->user()->id]);
         $this->audit($request, 'page.draft', $pageKey);
+        if ($request->input('intent') === 'preview') return to_route('admin.pages.preview', $pageKey);
         return to_route('admin.pages.edit', $pageKey)->with('success', 'Page draft saved.');
     }
 
@@ -94,11 +96,15 @@ class CmsPageController
     {
         $currentPage = CmsPage::query()->where('page_key', $pageKey)->with('translations')->first();
         $current = $currentPage?->draftFields('en') ?? [];
-        unset($current['homeSections']);
+        unset($current['homeSections'], $current['structuredData']);
         $submitted = $request->input('fields', []);
         if (!is_array($submitted)) throw \Illuminate\Validation\ValidationException::withMessages(['fields' => 'Enter page content and try again.']);
         $fields = [];
         foreach ($current as $key => $original) {
+            if (in_array($key, \App\Support\CmsPageFields::PRESERVED, true)) {
+                $fields[$key] = $original; // generated values the editor never shows
+                continue;
+            }
             $raw = $submitted[$key] ?? '';
             if (is_array($original)) {
                 if (!is_string($raw) || strlen($raw) > 200000) throw \Illuminate\Validation\ValidationException::withMessages(['fields.'.$key => 'This structured field is too long.']);
