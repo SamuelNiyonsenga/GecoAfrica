@@ -15,6 +15,11 @@
                     <p>Share a project brief, ask about our services or reach the GECO Africa team directly. We’ll help you find the right next step.</p>
                     <a class="button button-dark" href="#contact-form">Send a project enquiry <span aria-hidden="true">↓</span></a>
                 </div>
+                <figure class="contact-hero-photo">
+                    {{-- TODO(client): a higher-resolution photo of the office entrance would sharpen this. --}}
+                    <img src="{{ asset('images/gallery/officeone.jpg') }}" width="1500" height="844" alt="Entrance to the GECO Africa office in Kigali" fetchpriority="high" decoding="async">
+                    <figcaption><strong>Our office</strong><span>Avenue des Poids Lourds · Kigali</span></figcaption>
+                </figure>
             </div>
         </div>
     </section>

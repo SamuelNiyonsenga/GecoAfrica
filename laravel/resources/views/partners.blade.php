@@ -62,7 +62,7 @@
                             <img src="{{ asset($partner['image']) }}" width="300" height="190" alt="{{ $partner['alt'] }}" loading="lazy" decoding="async">
                         </div>
                         <div class="partner-card-content">
-                            @if ($partner['legacyName'])
+                            @if (!empty($partner['legacyName'] ?? null))
                                 <p class="partner-legacy-name">{{ $partner['legacyName'] }}</p>
                             @endif
                             <h3>{{ $partner['name'] }}</h3>

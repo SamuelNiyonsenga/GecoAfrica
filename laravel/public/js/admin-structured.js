@@ -1,9 +1,20 @@
 (() => {
-    const humanize = (value) => String(value)
+    // Plain-English names for keys used inside list editors (slides, facts, sections…).
+    const LABELS = {
+        accentHeadline: 'Highlighted words', headline: 'Headline', eyebrow: 'Small label above the headline',
+        description: 'Text', alt: 'Image description', imageAlt: 'Image description', image: 'Image file',
+        caption: 'Photo caption', detail: 'Caption detail', primaryLabel: 'Main button text', primaryUrl: 'Main button link',
+        secondaryLabel: 'Second button text', secondaryUrl: 'Second button link', label: 'Label', value: 'Number or year',
+        suffix: 'Symbol after the number', text: 'Text', heading: 'Heading', paragraphs: 'Paragraphs', title: 'Title',
+        url: 'Link', heroSlides: 'Slides', factsItems: 'Facts', companyPrinciples: 'Principles', sections: 'Article sections',
+    };
+    const SINGULAR = { Slides: 'Slide', Facts: 'Fact', Principles: 'Principle', 'Article sections': 'Section', Paragraphs: 'Paragraph' };
+    const humanize = (value) => LABELS[value] ?? String(value)
         .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
         .replace(/[_-]+/g, ' ')
         .replace(/\s+/g, ' ')
         .replace(/^./, (letter) => letter.toUpperCase());
+    const singular = (label) => SINGULAR[label] ?? label.replace(/ies$/, 'y').replace(/s$/, '');
 
     const blankFrom = (sample) => {
         if (Array.isArray(sample)) return [];
@@ -60,7 +71,7 @@
                 items.forEach((item, index) => {
                     const row = document.createElement('div');
                     row.className = 'structured-item';
-                    const content = renderValue(item, `${humanize(label)} ${index + 1}`, (next) => {
+                    const content = renderValue(item, `${singular(humanize(label))} ${index + 1}`, (next) => {
                         items[index] = next;
                         onChange(items);
                     }, itemTemplate);
@@ -69,7 +80,7 @@
                     remove.type = 'button';
                     remove.className = 'button button-small button-quiet structured-remove';
                     remove.textContent = 'Remove';
-                    remove.setAttribute('aria-label', `Remove ${humanize(label)} ${index + 1}`);
+                    remove.setAttribute('aria-label', `Remove ${singular(humanize(label))} ${index + 1}`);
                     remove.addEventListener('click', () => {
                         items.splice(index, 1);
                         onChange(items);
@@ -84,7 +95,7 @@
             const add = document.createElement('button');
             add.type = 'button';
             add.className = 'button button-small button-outline structured-add';
-            add.textContent = `Add ${humanize(label).replace(/s$/, '')}`;
+            add.textContent = `Add ${singular(humanize(label)).toLowerCase()}`;
             add.addEventListener('click', () => {
                 const next = itemTemplate && typeof itemTemplate === 'object' ? blankFrom(itemTemplate) : (Array.isArray(itemTemplate) ? (itemTemplate.length ? blankFrom(itemTemplate[0]) : '') : '');
                 items = [...items, next];
@@ -141,6 +152,14 @@
         };
         root.append(renderValue(value, label, update, template));
         update(value);
+    });
+
+    document.querySelectorAll('[data-cms-page-form]').forEach((form) => {
+        let unsaved = false; let submitting = false;
+        form.addEventListener('input', () => { unsaved = true; });
+        form.addEventListener('change', () => { unsaved = true; });
+        form.addEventListener('submit', () => { submitting = true; });
+        window.addEventListener('beforeunload', (event) => { if (unsaved && !submitting) { event.preventDefault(); event.returnValue = ''; } });
     });
 
     document.querySelectorAll('[data-cms-editor-form]').forEach((form) => {
@@ -208,14 +227,70 @@
         try{const response=await fetch('/admin/media',{method:'POST',headers:{Accept:'application/json','X-CSRF-TOKEN':csrf},body:data});if(!response.ok)throw new Error('Upload failed');const result=await response.json();if(result.items?.length){renderItems(result.items);status.textContent='Upload complete. Choose the new file above.';}else status.textContent='Upload complete.';}
         catch{status.textContent='Upload failed. Check the file type and try again.';}finally{event.target.value='';}
     });
-    document.querySelectorAll('[data-cms-editor-form]').forEach((form)=>{
-        const slug=form.querySelector('[data-slug-input]');const toggle=form.querySelector('[data-slug-toggle]');const titleKey=form.dataset.titleField;const title=titleKey?form.querySelector(`[name="fields[${titleKey}]"]`):null;const url=form.querySelector('[data-public-url]');let dirty=false;let submitted=false;
-        const makeSlug=(value)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-        if(slug && form.dataset.entryExisting!=='1'){slug.readOnly=true;const update=()=>{if(!dirty)slug.value=makeSlug(title?.value||'');if(url)url.textContent=`${location.origin}${location.pathname.replace(/\/create$/,'')}/${slug.value}`;};title?.addEventListener('input',update);update();}
-        toggle?.addEventListener('click',()=>{slug.readOnly=!slug.readOnly;toggle.textContent=slug.readOnly?'Edit':'Lock';if(!slug.readOnly)slug.focus();});
-        form.addEventListener('input',()=>{dirty=true;if(url&&slug)url.textContent=`${location.origin}${location.pathname.replace(/\/create$/,'')}/${slug.value}`;});
-        form.addEventListener('submit',()=>{submitted=true;});
-        window.addEventListener('beforeunload',(event)=>{if(dirty&&!submitted){event.preventDefault();event.returnValue='';}});
+    // Keep each media field's thumbnail and Remove button in step with its value.
+    document.querySelectorAll('[data-media-value]').forEach((input) => {
+        const control = input.nextElementSibling;
+        const sync = () => {
+            const thumb = control?.querySelector('[data-media-thumb]');
+            const remove = control?.querySelector('[data-media-remove]');
+            const isImage = /\.(jpe?g|png|webp|gif|svg)$/i.test(input.value);
+            if (thumb) { thumb.hidden = !isImage; thumb.src = isImage ? '/' + input.value.replace(/^\/+/, '') : ''; }
+            if (remove) remove.hidden = input.value === '';
+        };
+        input.addEventListener('change', sync);
+    });
+
+    // Content editor: web address that follows the title, and an unsaved-changes guard.
+    // makeSlug mirrors App\\Support\\CmsSlug::make() on the server.
+    const makeSlug = (value) => value
+        .replace(/['\u2019\u2018`\u00b4]/g, ' ')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+        .slice(0, 180).replace(/-+$/, '');
+
+    document.querySelectorAll('[data-cms-editor-form]').forEach((form) => {
+        const slug = form.querySelector('[data-slug-input]');
+        const toggle = form.querySelector('[data-slug-toggle]');
+        const publicUrl = form.querySelector('[data-public-url]');
+        const titleKey = form.dataset.titleField;
+        const title = titleKey ? form.querySelector(`[name="fields[${titleKey}]"]`) : null;
+        const isNew = form.dataset.entryExisting !== '1';
+        let slugEditedByHand = !isNew || (slug && slug.value !== '' && slug.value !== makeSlug(title?.value || ''));
+        let unsaved = false;
+        let submitting = false;
+
+        const showPublicUrl = () => {
+            if (!publicUrl || !slug) return;
+            publicUrl.textContent = publicUrl.dataset.publicTemplate.replace('__slug__', slug.value || '…');
+        };
+        const followTitle = () => {
+            if (!slug || slugEditedByHand) return;
+            slug.value = makeSlug(title?.value || '');
+            showPublicUrl();
+        };
+
+        title?.addEventListener('input', followTitle);
+        slug?.addEventListener('input', () => {
+            slugEditedByHand = true;
+            slug.value = slug.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/-{2,}/g, '-');
+            showPublicUrl();
+        });
+        toggle?.addEventListener('click', () => {
+            const unlock = slug.readOnly;
+            slug.readOnly = !unlock;
+            toggle.textContent = unlock ? 'Lock' : 'Edit';
+            toggle.setAttribute('aria-pressed', unlock ? 'true' : 'false');
+            if (unlock) slug.focus();
+            if (!unlock && isNew && slug.value === '') { slugEditedByHand = false; followTitle(); }
+        });
+        if (isNew) followTitle(); else showPublicUrl();
+
+        form.addEventListener('input', () => { unsaved = true; });
+        form.addEventListener('change', () => { unsaved = true; });
+        form.addEventListener('submit', () => { submitting = true; });
+        window.addEventListener('beforeunload', (event) => {
+            if (unsaved && !submitting) { event.preventDefault(); event.returnValue = ''; }
+        });
     });
     const uploadForm=document.querySelector('[data-media-upload-form]');uploadForm?.addEventListener('submit',(event)=>{const input=uploadForm.querySelector('input[type=file]');const progress=uploadForm.querySelector('[data-upload-progress]');const status=uploadForm.querySelector('[data-upload-status]');if(!input?.files?.length||!window.XMLHttpRequest)return;event.preventDefault();const body=new FormData(uploadForm);const xhr=new XMLHttpRequest();xhr.open('POST',uploadForm.action);xhr.upload.onprogress=(e)=>{if(e.lengthComputable){progress.hidden=false;progress.value=Math.round(e.loaded/e.total*100);status.textContent=`Uploading ${progress.value}%`;}};xhr.onload=()=>{if(xhr.status>=200&&xhr.status<400){status.textContent='Upload complete.';location.reload();}else status.textContent='Upload failed. Check the selected files and try again.';};xhr.onerror=()=>status.textContent='Upload failed. Check your connection and try again.';xhr.send(body);});
 })();

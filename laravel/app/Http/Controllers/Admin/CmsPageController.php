@@ -38,7 +38,7 @@ class CmsPageController
                 $sectionSettings[$key] = array_merge(['label' => $label, 'order' => count($sectionSettings) + 1, 'visible' => true], $fields['homeSections'][$key] ?? []);
             }
         }
-        return view('admin.pages.edit', ['page' => $page, 'translation' => $translation, 'label' => self::PAGES[$pageKey], 'sectionSettings' => $sectionSettings, 'versions' => CmsContentVersion::query()->where('entity_type', 'page')->where('entity_key', $pageKey)->latest('created_at')->limit(30)->get()]);
+        return view('admin.pages.edit', ['page' => $page, 'translation' => $translation, 'label' => self::PAGES[$pageKey], 'sectionSettings' => $sectionSettings, 'fieldGroups' => \App\Support\CmsPageFields::grouped($fields), 'versions' => CmsContentVersion::query()->where('entity_type', 'page')->where('entity_key', $pageKey)->latest('created_at')->limit(30)->get()]);
     }
 
     public function saveDraft(Request $request, string $pageKey): RedirectResponse
@@ -101,6 +101,10 @@ class CmsPageController
         if (!is_array($submitted)) throw \Illuminate\Validation\ValidationException::withMessages(['fields' => 'Enter page content and try again.']);
         $fields = [];
         foreach ($current as $key => $original) {
+            if (in_array($key, \App\Support\CmsPageFields::PRESERVED, true)) {
+                $fields[$key] = $original; // generated values the editor never shows
+                continue;
+            }
             $raw = $submitted[$key] ?? '';
             if (is_array($original)) {
                 if (!is_string($raw) || strlen($raw) > 200000) throw \Illuminate\Validation\ValidationException::withMessages(['fields.'.$key => 'This structured field is too long.']);
@@ -113,7 +117,7 @@ class CmsPageController
                 $fields[$key] = trim((string) $raw);
             }
         }
-        return array_replace($generated ?? [], $fields);
+        return $fields;
     }
     private function version(string $key, array $fields, string $note): void
     {

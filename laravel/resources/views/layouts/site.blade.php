@@ -7,7 +7,7 @@
     @hasSection('robots')<meta name="robots" content="@yield('robots')">@else<meta name="robots" content="index, follow, max-image-preview:large">@endif
     <title>{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}</title>
     <meta name="description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
-    <link rel="canonical" href="{{ $canonicalUrl ?? 'https://gecoafrica.com/' }}">
+    <link rel="canonical" href="{{ \App\Support\Canonical::current() }}">
     <link rel="preload" as="font" type="font/woff2" href="{{ asset('fonts/inter-latin-wght-normal.woff2') }}" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="{{ asset('fonts/source-serif-4-latin-wght-normal.woff2') }}" crossorigin>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
@@ -15,14 +15,15 @@
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     @if (!empty($preloadImage))
-        <link rel="preload" as="image" href="{{ $preloadImage }}" fetchpriority="high">
+        {{-- Preload this site's own copy, even when the stored value is a gecoafrica.com address. --}}
+        <link rel="preload" as="image" href="{{ asset(ltrim(preg_replace('#^https?://(www\.)?gecoafrica\.com/#i', '', $preloadImage), '/')) }}" fetchpriority="high">
     @endif
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_RW">
     <meta property="og:site_name" content="GECO Africa">
     <meta property="og:title" content="{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}">
     <meta property="og:description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
-    <meta property="og:url" content="{{ $canonicalUrl ?? 'https://gecoafrica.com/' }}">
+    <meta property="og:url" content="{{ \App\Support\Canonical::current() }}">
     <meta property="og:image" content="{{ $ogImage ?? 'https://gecoafrica.com/images/home/fieldwork-drilling.webp' }}">
     <meta property="og:image:alt" content="{{ $ogImageAlt ?? 'GECO Africa engineering and geotechnical work in Rwanda' }}">
     <meta name="twitter:card" content="summary_large_image">
@@ -132,6 +133,10 @@
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a>
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $secondaryPhone) }}">{{ $secondaryPhone }}</a>
                 <span>{{ $siteAddress ?? ($siteSettings['address'] ?? 'Avenue des Poids Lourds, Source Oil Petrol Station building') }}<br>P.O. Box {{ $sitePoBox ?? ($siteSettings['po_box'] ?? '3711') }}, {{ $siteCity ?? ($siteSettings['city'] ?? 'Kigali') }}, {{ $siteCountry ?? ($siteSettings['country'] ?? 'Rwanda') }}</span>
+                @php($openingHours = array_values(array_filter(is_array($siteSettings['opening_hours'] ?? null) ? $siteSettings['opening_hours'] : [])))
+                @if ($openingHours)
+                    <span class="footer-hours">@foreach ($openingHours as $line){{ $line }}@if(!$loop->last)<br>@endif @endforeach</span>
+                @endif
                 @php($socialLinks = is_array($siteSettings['social_links'] ?? null) ? $siteSettings['social_links'] : [])
                 @if ($socialLinks)
                     <nav class="footer-social" aria-label="Social media">

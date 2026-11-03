@@ -43,11 +43,11 @@
             <p class="activity-results" data-activity-results role="status" aria-live="polite">Showing {{ count($activities) }} assignments</p>
             <div class="activity-grid">
                 @foreach ($activities as $activity)
-                    <article class="activity-card" id="activity-{{ $activity['id'] }}" data-activity-card data-activity-category="{{ $activity['category'] }}" data-activity-search-text="{{ strtolower($activity['title'].' '.$activity['client'].' '.$activity['category'].' '.$activity['date']) }}" data-reveal>
+                    <article class="activity-card" id="activity-{{ ($activity['id'] ?? $activity['slug']) }}" data-activity-card data-activity-category="{{ $activity['category'] }}" data-activity-search-text="{{ strtolower($activity['title'].' '.$activity['client'].' '.$activity['category'].' '.$activity['date']) }}" data-reveal>
                         <div class="activity-card-top"><span class="activity-card-category"><i aria-hidden="true"></i>{{ $activity['category'] }}</span><span class="activity-card-date">{{ $activity['date'] }}</span></div>
                         <h3>{{ $activity['title'] }}</h3>
                         <div class="activity-card-meta"><div><span>Client</span><strong>{{ $activity['client'] }}</strong></div><div><span>Duration</span><strong>{{ $activity['duration'] }}</strong></div>@if (!empty($activity['location']))<div><span>Location</span><strong>{{ $activity['location'] }}</strong></div>@endif</div>
-                        <a href="{{ route('contact') }}?subject={{ rawurlencode('Enquiry about GECO Africa activity '.$activity['id']) }}" class="activity-card-link">Discuss a similar assignment <span aria-hidden="true">↗</span></a>
+                        <a href="{{ route('contact') }}?subject={{ rawurlencode('Enquiry about GECO Africa activity '.($activity['id'] ?? $activity['slug'])) }}" class="activity-card-link">Discuss a similar assignment <span aria-hidden="true">↗</span></a>
                     </article>
                 @endforeach
             </div>

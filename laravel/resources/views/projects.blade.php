@@ -56,12 +56,12 @@
                             <p class="featured-project-location">{{ $project['location'] }}</p>
                             <h3>{{ $project['title'] }}</h3>
                             <p>{{ $project['summary'] }}</p>
-                            @isset($project['areaNote'])
+                            @if(!empty($project['areaNote']))
                                 <details class="project-source-note">
                                     <summary>About the published area figures</summary>
                                     <p>{{ $project['areaNote'] }}</p>
                                 </details>
-                            @endisset
+                            @endif
                             <a class="featured-project-action" href="#project-references">Explore project references <span aria-hidden="true">↗</span></a>
                         </div>
                     </article>
@@ -112,8 +112,8 @@
                                     <span class="reference-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                                     <div>
                                         <h4>{{ $project['title'] }}</h4>
-                                        <p><span>Location</span>{{ $project['location'] }}</p>
-                                        <p><span>Client</span>{{ $project['client'] }}</p>
+                                        @if (($project['location'] ?? '') !== '')<p><span>Location</span>{{ $project['location'] }}</p>@endif
+                                        @if (($project['client'] ?? '') !== '')<p><span>Client</span>{{ $project['client'] }}</p>@endif
                                     </div>
                                 </article>
                             </li>

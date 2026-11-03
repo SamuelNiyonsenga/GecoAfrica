@@ -154,9 +154,9 @@
                             <p class="person-role">{{ $person['role'] }}</p>
                             <h3>{{ $person['name'] }}</h3>
                             <p class="person-bio">{{ $person['bio'] }}</p>
-                            @isset($person['profile'])
+                            @if(!empty($person['profile']))
                                 <p class="person-profile"><span>Profile</span>{{ $person['profile'] }}</p>
-                            @endisset
+                            @endif
                             <a class="person-cv-link" href="{{ asset($person['cv']) }}" target="_blank" rel="noopener">View CV (PDF) <span aria-hidden="true">↗</span></a>
                         </div>
                     </article>

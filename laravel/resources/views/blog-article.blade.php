@@ -27,13 +27,15 @@
                 <span class="insight-aside-label">In this guide</span>
                 <nav aria-label="Article contents">
                     @foreach ($article['sections'] as $section)
-                        <a href="#guide-section-{{ $loop->iteration }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $section['heading'] }}</a>
+                        <a href="#guide-section-{{ $loop->iteration }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $section['heading'] ?? '' }}</a>
                     @endforeach
                 </nav>
+                @if ($article['serviceAnchor'] !== '' && $article['serviceLabel'] !== '')
                 <div class="insight-aside-related">
                     <span class="insight-aside-label">Related service</span>
                     <a href="{{ route('services') }}#{{ $article['serviceAnchor'] }}">{{ $article['serviceLabel'] }} <span aria-hidden="true">↗</span></a>
                 </div>
+                @endif
             </aside>
 
             <article class="insight-article-body">
@@ -41,8 +43,8 @@
                     <section id="guide-section-{{ $loop->iteration }}" class="insight-content-section">
                         <span class="insight-section-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                         <div>
-                            <h2>{{ $section['heading'] }}</h2>
-                            @foreach ($section['paragraphs'] as $paragraph)
+                            <h2>{{ $section['heading'] ?? '' }}</h2>
+                            @foreach ((array) ($section['paragraphs'] ?? []) as $paragraph)
                                 <p>{{ $paragraph }}</p>
                             @endforeach
                         </div>

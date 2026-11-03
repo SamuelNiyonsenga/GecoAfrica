@@ -14,7 +14,7 @@ class ActivitiesController extends Controller
             '@type' => 'ListItem',
             'position' => $index + 1,
             'name' => $activity['title'],
-            'url' => 'https://gecoafrica.com/activities/#activity-'.$activity['id'],
+            'url' => 'https://gecoafrica.com/activities/#activity-'.($activity['id'] ?? $activity['slug'] ?? ''),
         ], $activities, array_keys($activities));
 
         return view('activities', [

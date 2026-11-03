@@ -2,6 +2,10 @@
 
 The Laravel website and its English CMS live in this folder. The earlier PHP site at the repository root remains separate. CMS content is stored in the `geco_cms` MySQL/MariaDB database and is seeded from Laravel's existing content catalogs; public URLs stay unchanged.
 
+- **Deploying to production:** see [DEPLOY.md](DEPLOY.md).
+- **Guide for the client's editors:** see [docs/CMS-GUIDE.md](docs/CMS-GUIDE.md).
+- **Tests:** `php artisan test` (uses an in-memory SQLite database; nothing touches MySQL).
+
 ## Run locally with XAMPP
 
 1. Start Apache and MySQL from the XAMPP control panel.
@@ -44,4 +48,16 @@ After pulling updates that add homepage or page-editor fields, run the idempoten
 
 ```powershell
 php artisan cms:sync-page-fields
+```
+
+## Updating an existing local install
+
+After pulling new changes, from this folder:
+
+```powershell
+composer install
+php artisan migrate
+php artisan cms:sync-page-fields
+php artisan view:clear
+php artisan test
 ```

@@ -17,9 +17,11 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ActivitiesController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/services', [ServicesController::class, 'index'])->name('services');
 Route::get('/projects', [ProjectsController::class, 'index'])->name('projects');
@@ -76,21 +78,36 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
     });
 });
 
-Route::get('/about.php', fn () => redirect('/about/', 301))->name('about.legacy');
-Route::get('/services.php', fn () => redirect('/services/', 301))->name('services.legacy');
-Route::get('/project.php', fn () => redirect('/projects/', 301))->name('projects.legacy');
-Route::get('/team1.php', fn () => redirect('/team/', 301))->name('team.legacy');
-Route::get('/Our_Partners.php', fn () => redirect('/partners/', 301))->name('partners.legacy');
-Route::get('/gallery.php', fn () => redirect('/gallery/', 301))->name('gallery.legacy');
-Route::get('/blog.php', fn () => redirect('/blog/', 301))->name('blog.legacy');
+Route::get('/about.php', fn () => redirect('/about', 301))->name('about.legacy');
+Route::get('/services.php', fn () => redirect('/services', 301))->name('services.legacy');
+Route::get('/project.php', fn () => redirect('/projects', 301))->name('projects.legacy');
+Route::get('/team1.php', fn () => redirect('/team', 301))->name('team.legacy');
+Route::get('/Our_Partners.php', fn () => redirect('/partners', 301))->name('partners.legacy');
+Route::get('/gallery.php', fn () => redirect('/gallery', 301))->name('gallery.legacy');
+Route::get('/blog.php', fn () => redirect('/blog', 301))->name('blog.legacy');
 Route::get('/events.php', function () {
     $activityId = request()->query('id');
     $fragment = is_string($activityId) && ctype_digit($activityId) ? '#activity-'.$activityId : '';
 
     return redirect()->to(route('activities').$fragment, 301);
 })->name('activities.legacy');
-Route::get('/contact.php', fn () => redirect('/contact/', 301))->name('contact.legacy');
-Route::get('/blog-single.php', fn () => redirect('/team/#aline-mukaneza', 301))->name('team.aline.legacy');
-Route::get('/blog-single2.php', fn () => redirect('/team/#jean-kizito', 301))->name('team.jean.legacy');
-Route::get('/blog-single3.php', fn () => redirect('/team/#marie-assoumpta', 301))->name('team.marie.legacy');
-Route::get('/blog-single4.php', fn () => redirect('/team/#angelique-muhawenimana', 301))->name('team.angelique.legacy');
+Route::get('/contact.php', fn () => redirect('/contact', 301))->name('contact.legacy');
+Route::get('/blog-single.php', fn () => redirect('/team#aline-mukaneza', 301))->name('team.aline.legacy');
+Route::get('/blog-single2.php', fn () => redirect('/team#jean-kizito', 301))->name('team.jean.legacy');
+Route::get('/blog-single3.php', fn () => redirect('/team#marie-assoumpta', 301))->name('team.marie.legacy');
+Route::get('/blog-single4.php', fn () => redirect('/team#angelique-muhawenimana', 301))->name('team.angelique.legacy');
+
+// Remaining pages of the old PHP site.
+Route::get('/home.php', fn () => redirect('/', 301));
+Route::get('/index2.php', fn () => redirect('/', 301));
+Route::get('/default.php', fn () => redirect('/', 301));
+Route::get('/allevents.php', fn () => redirect('/activities', 301));
+Route::get('/event_details.php', function () {
+    $activityId = request()->query('id');
+    return redirect()->to(route('activities').(is_string($activityId) && ctype_digit($activityId) ? '#activity-'.$activityId : ''), 301);
+});
+Route::get('/proje.php', fn () => redirect('/projects', 301));
+Route::get('/proje2.php', fn () => redirect('/projects', 301));
+Route::get('/team.php', fn () => redirect('/team', 301));
+Route::get('/profile.php', fn () => redirect('/team', 301));
+Route::get('/design.php', fn () => redirect('/services', 301));

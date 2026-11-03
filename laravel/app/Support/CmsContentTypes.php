@@ -66,24 +66,20 @@ class CmsContentTypes
             ]],
             'gallery' => ['type' => 'gallery_item', 'label' => 'Gallery', 'singular' => 'gallery item', 'fields' => [
                 'title' => ['label' => 'Title', 'type' => 'text', 'required' => true],
-                'category' => ['label' => 'Category', 'type' => 'text'],
+                'category' => ['label' => 'Category', 'type' => 'category', 'source' => 'gallery_category', 'hint' => 'Which gallery filter this photo appears under. Manage the list in Gallery categories.'],
                 'image' => ['label' => 'Photo or video', 'type' => 'media'],
                 'alt' => ['label' => 'Image description', 'type' => 'text'],
-                'caption' => ['label' => 'Caption', 'type' => 'textarea'],
-                'legacyTitle' => ['label' => 'Original title', 'type' => 'text'],
-                'legacyCategory' => ['label' => 'Original category', 'type' => 'text'],
+                'caption' => ['label' => 'Caption', 'type' => 'textarea', 'hint' => 'Shown under the photo when a visitor opens it full size.'],
             ]],
             'blog' => ['type' => 'blog_post', 'label' => 'Blog and insights', 'singular' => 'article', 'fields' => [
                 'title' => ['label' => 'Article title', 'type' => 'text', 'required' => true],
-                'category' => ['label' => 'Category name', 'type' => 'text'],
-                'categorySlug' => ['label' => 'Category key', 'type' => 'text'],
+                'categorySlug' => ['label' => 'Category', 'type' => 'category', 'source' => 'blog_category', 'hint' => 'Which Insights filter this article appears under. Manage the list in Blog categories.'],
                 'eyebrow' => ['label' => 'Short heading', 'type' => 'text'],
                 'summary' => ['label' => 'Summary', 'type' => 'textarea'],
                 'image' => ['label' => 'Cover image', 'type' => 'media'],
                 'imageAlt' => ['label' => 'Cover image description', 'type' => 'text'],
                 'readTime' => ['label' => 'Reading time', 'type' => 'text'],
-                'serviceAnchor' => ['label' => 'Related service key', 'type' => 'text'],
-                'serviceLabel' => ['label' => 'Related service name', 'type' => 'text'],
+                'serviceAnchor' => ['label' => 'Related service', 'type' => 'category', 'source' => 'service', 'hint' => 'The service linked in the "Related service" box beside the article.'],
                 'sections' => ['label' => 'Article sections', 'type' => 'json', 'template' => [['heading' => '', 'paragraphs' => ['']]]],
             ]],
             'gallery-categories' => ['type' => 'gallery_category', 'label' => 'Gallery categories', 'singular' => 'gallery category', 'fields' => [
@@ -121,6 +117,21 @@ class CmsContentTypes
             'tags' => 'Small service labels shown on the card and detail page.',
             'website' => 'External website visitors can open from this partner profile.',
             'sections' => 'Article headings and paragraphs shown in the article body.',
+            'category' => 'Short label shown above the name on its card, e.g. Water & field services.',
+            'location' => 'Where the work took place, e.g. Nyanza District.',
+            'client' => 'The client or organisation the work was for.',
+            'date' => 'When it happened, as visitors should read it, e.g. Jun 2021.',
+            'duration' => 'How long it ran, e.g. June to July 2021.',
+            'websiteLabel' => 'Short web address shown as the link text, e.g. afridrillers.com.',
+            'eyebrow' => 'Small label in capitals shown above the article title.',
+            'readTime' => 'Shown next to the category, e.g. 5 min read.',
+            'qualification' => 'Degree or professional title shown in the team profile.',
+            'cv' => 'PDF visitors can open from the "View CV" button.',
+            'priceList' => 'File visitors can download from this service, e.g. a price list PDF.',
+            'areaNote' => 'Extra detail visitors can expand under the project summary.',
+            'imageCaption' => 'Caption shown on the photo.',
+            'bio' => 'Main biography paragraph on the team page.',
+            'expertise' => 'One area per line. Shown as small tags under the profile.',
         ];
         foreach ($types as &$type) {
             foreach ($type['fields'] as $key => &$field) {
@@ -135,5 +146,44 @@ class CmsContentTypes
     public static function get(string $section): ?array
     {
         return self::all()[$section] ?? null;
+    }
+
+    public static function forType(string $type): ?array
+    {
+        foreach (self::all() as $definition) {
+            if ($definition['type'] === $type) {
+                return $definition;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Empty values for every field a content type defines, so public views never
+     * hit an undefined key when the client leaves optional fields blank.
+     */
+    public static function defaultsForType(string $type): array
+    {
+        $defaults = [];
+        foreach (self::forType($type)['fields'] ?? [] as $key => $spec) {
+            $defaults[$key] = in_array($spec['type'], ['list', 'json'], true) ? [] : '';
+        }
+        return $defaults;
+    }
+
+    /** Public page where an item of this type appears, with its anchor when the page has one. */
+    public static function publicUrl(string $type, ?string $slug = null): ?string
+    {
+        return match ($type) {
+            'blog_post' => $slug ? route('blog.show', $slug) : route('blog'),
+            'blog_category' => route('blog'),
+            'service' => route('services').($slug ? '#'.$slug : ''),
+            'team_member' => route('team').($slug ? '#'.$slug : ''),
+            'partner' => route('partners'),
+            'gallery_item', 'gallery_category' => route('gallery'),
+            'project_group', 'project_reference', 'project_feature' => route('projects'),
+            'activity' => route('activities'),
+            default => null,
+        };
     }
 }

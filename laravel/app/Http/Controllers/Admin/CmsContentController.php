@@ -50,6 +50,7 @@ class CmsContentController extends Controller
             'fields' => [],
             'assets' => $this->mediaOptions(),
             'parents' => $this->parents($definition),
+            'categoryOptions' => $this->categoryFieldOptions($definition),
             'versions' => collect(),
         ]);
     }
@@ -59,7 +60,7 @@ class CmsContentController extends Controller
         $definition = $this->definition($section);
         if (blank($request->input('slug'))) {
             $title = $request->input('fields.title', $request->input('fields.name', ''));
-            $request->merge(['slug' => Str::slug((string) $title)]);
+            $request->merge(['slug' => \App\Support\CmsSlug::make((string) $title)]);
         }
         $meta = $this->validateMeta($request, $definition, null);
         $fields = $this->validateFields($request, $definition);
@@ -98,6 +99,7 @@ class CmsContentController extends Controller
             'trashedMediaFields' => $this->trashedMediaFields($definition, $entry->draftFields('en')),
             'assets' => $this->mediaOptions(),
             'parents' => $this->parents($definition),
+            'categoryOptions' => $this->categoryFieldOptions($definition),
             'versions' => CmsContentVersion::query()->where('entity_type', 'content')->where('entity_key', (string) $entry->id)->latest('created_at')->limit(30)->get(),
         ]);
     }
@@ -281,9 +283,34 @@ class CmsContentController extends Controller
                     throw ValidationException::withMessages(['fields.'.$key => 'Choose a file from the media library.']);
                 }
             }
+            if ($spec['type'] === 'category' && $value !== '' && !array_key_exists($value, $this->categoryOptions($spec['source']))) {
+                throw ValidationException::withMessages(['fields.'.$key => 'Choose a category from the list.']);
+            }
             $fields[$key] = $value;
         }
         return $fields;
+    }
+
+    /** Category choices for a `category` field: web address => display name. */
+    private function categoryOptions(string $sourceType): array
+    {
+        return CmsContentEntry::query()->where('type', $sourceType)->where('slug', '<>', 'all')->with('translations')->orderBy('sort_order')->get()
+            ->mapWithKeys(function (CmsContentEntry $entry): array {
+                $fields = array_merge($entry->translatedFields('en'), array_filter($entry->draftFields('en')));
+                $name = ($fields['name'] ?? '') ?: ($fields['title'] ?? '') ?: ($fields['label'] ?? '') ?: $entry->slug;
+                return [$entry->slug => $name.($entry->status === 'published' ? '' : ' (draft)')];
+            })->all();
+    }
+
+    private function categoryFieldOptions(array $definition): array
+    {
+        $options = [];
+        foreach ($definition['fields'] as $key => $spec) {
+            if ($spec['type'] === 'category') {
+                $options[$key] = $this->categoryOptions($spec['source']);
+            }
+        }
+        return $options;
     }
 
     private function trashedMediaFields(array $definition, array $fields): array

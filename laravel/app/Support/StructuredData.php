@@ -32,7 +32,7 @@ class StructuredData
             '@type' => $pageKey === 'contact' ? 'ContactPage' : ($pageKey === 'home' ? 'WebSite' : 'WebPage'),
             'name' => $page['pageTitle'] ?? ($settings['business_name'] ?? 'GECO Africa Ltd'),
             'description' => $page['pageDescription'] ?? '',
-            'url' => $page['canonicalUrl'] ?? $siteUrl.'/',
+            'url' => Canonical::current(),
             'isPartOf' => ['@id' => $siteUrl.'/#website'],
             'publisher' => ['@id' => $siteUrl.'/#organization'],
         ];

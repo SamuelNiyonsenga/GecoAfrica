@@ -85,7 +85,7 @@
             <button class="gallery-lightbox-close" type="button" data-gallery-close aria-label="Close photograph viewer">×</button>
             <button class="gallery-lightbox-arrow gallery-lightbox-prev" type="button" data-gallery-prev aria-label="Previous photograph">‹</button>
             <figure class="gallery-lightbox-figure">
-                <div class="gallery-lightbox-image-wrap"><img data-gallery-lightbox-image src="" width="1500" height="844" alt="" decoding="async"></div>
+                <div class="gallery-lightbox-image-wrap"><img data-gallery-lightbox-image width="1500" height="844" alt="" decoding="async"></div>
                 <figcaption>
                     <div><p data-gallery-lightbox-category></p><h2 data-gallery-lightbox-title></h2><span data-gallery-lightbox-caption></span></div>
                     <small data-gallery-lightbox-count></small>

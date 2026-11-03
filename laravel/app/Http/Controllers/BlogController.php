@@ -24,7 +24,9 @@ class BlogController extends Controller
         $categoryCounts = array_fill_keys(array_keys($categories), 0);
         $categoryCounts['all'] = count(CmsContentRepository::blog());
         foreach (CmsContentRepository::blog() as $article) {
-            $categoryCounts[$article['categorySlug']]++;
+            if (isset($categoryCounts[$article['categorySlug'] ?? ''])) {
+                $categoryCounts[$article['categorySlug']]++;
+            }
         }
 
         $itemList = array_map(static fn (array $article, int $index): array => [
