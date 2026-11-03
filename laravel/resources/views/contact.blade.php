@@ -105,19 +105,19 @@
 
                         <div class="contact-detail-item">
                             <span class="contact-detail-icon" aria-hidden="true">01</span>
-                            <div><small>Call our office</small><a href="tel:+250788842990">+250 788 842 990</a><a href="tel:+250788572346">+250 788 572 346</a></div>
+                            <div><small>Call our office</small><a href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a><a href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSecondaryPhone) }}">{{ $siteSecondaryPhone }}</a></div>
                         </div>
                         <div class="contact-detail-item">
                             <span class="contact-detail-icon" aria-hidden="true">02</span>
-                            <div><small>Email</small><a href="mailto:info@gecoafrica.com">info@gecoafrica.com</a></div>
+                            <div><small>Email</small><a href="mailto:{{ $sitePublicEmail }}">{{ $sitePublicEmail }}</a></div>
                         </div>
                         <div class="contact-detail-item">
                             <span class="contact-detail-icon" aria-hidden="true">03</span>
-                            <div><small>Office</small><p>Avenue des Poids Lourds,<br>Source Oil Petrol Station building,<br>Kigali, Rwanda</p></div>
+                            <div><small>Office</small><p>{{ $siteAddress }}, {{ $siteCity }}, {{ $siteCountry }}</p></div>
                         </div>
                         <div class="contact-detail-item">
                             <span class="contact-detail-icon" aria-hidden="true">04</span>
-                            <div><small>Postal address</small><p>P.O. Box 3711, Kigali</p></div>
+                            <div><small>Postal address</small><p>P.O. Box {{ $sitePoBox }}, {{ $siteCity }}</p></div>
                         </div>
 
                         <a class="contact-website-link" href="https://gecoafrica.com/" target="_blank" rel="noopener noreferrer">gecoafrica.com <span aria-hidden="true">↗</span></a>
@@ -125,7 +125,7 @@
 
                     <section class="contact-map-card" aria-label="Find the GECO Africa office">
                         <div class="contact-map-heading"><div><span>Find our office</span><strong>Kigali, Rwanda</strong></div><span aria-hidden="true">↗</span></div>
-                        <div class="contact-map-slot" data-contact-map-slot><p>Avenue des Poids Lourds, Kigali, Rwanda</p><button type="button" data-contact-load-map>Load interactive map</button></div>
+                        <div class="contact-map-slot" data-contact-map-slot><p>{{ $siteAddress }}, {{ $siteCity }}, {{ $siteCountry }}</p><button type="button" data-contact-load-map>Load interactive map</button></div>
                         <div class="contact-map-actions">
                             <a href="https://www.google.com/maps/search/?api=1&amp;query=GECO+Africa+LTD+Kigali" target="_blank" rel="noopener noreferrer">Open in Google Maps <span aria-hidden="true">↗</span></a>
                             <a href="https://www.google.com/maps/dir/?api=1&amp;destination=GECO+Africa+LTD+Kigali" target="_blank" rel="noopener noreferrer">Get directions <span aria-hidden="true">↗</span></a>

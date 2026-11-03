@@ -22,7 +22,7 @@
 @else<input id="page-field-{{ $key }}" name="fields[{{ $key }}]" value="{{ $oldValue ?? $value }}" maxlength="20000">@endif
 @error('fields.'.$key)<span class="field-error">{{ $message }}</span>@enderror</div>
 @endforeach</div>
-<div class="form-actions"><button class="button button-quiet" type="submit">Save draft</button><button class="button button-brand" type="submit" formaction="{{ route('admin.pages.publish', $page->page_key) }}">Publish this version</button></div></form>
+<div class="form-actions"><button class="button button-quiet" type="submit">Save draft</button><button class="button button-outline" type="submit" name="intent" value="preview" formtarget="_blank">Preview</button><button class="button button-brand" type="submit" formaction="{{ route('admin.pages.publish', $page->page_key) }}">Publish this version</button></div></form>
 <p class="muted">Last published {{ $translation->published_at?->diffForHumans() ?? 'never' }}</p>
 @if($versions->isNotEmpty())<section class="panel"><h2>Version history</h2><div class="version-list">@foreach($versions as $version)<form method="post" action="{{ route('admin.pages.restore-version', [$page->page_key,$version]) }}">@csrf<span>{{ $version->created_at?->format('d M Y, H:i') }}</span><button class="button button-small button-outline">Restore to draft</button></form>@endforeach</div></section>@endif
 @endsection

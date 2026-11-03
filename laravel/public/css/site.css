@@ -2047,5 +2047,12 @@ body .site-container :is(.service-card:hover, .project-card:hover, .team-person-
 .contact-map-actions > a { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px; border-top: 1px solid #dfe4dc; color: var(--forest); font-size: var(--fs-caption); font-weight: 800; }
 .contact-map-actions > a + a { border-left: 1px solid #dfe4dc; }
 .contact-map-actions > a span { color: #dd1c26; }
+.cms-preview-banner { position: fixed; z-index: 100; inset: 0 0 auto; display: flex; min-height: 52px; align-items: center; justify-content: center; gap: 20px; padding: 7px 18px; color: white; background: var(--forest-deep); font-size: var(--fs-small); }
+.cms-preview-banner a, .cms-preview-banner button { display: inline-flex; min-height: 38px; align-items: center; padding: 0 12px; border: 1px solid rgba(255,255,255,.55); color: white; background: transparent; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+.cms-preview-banner form { margin: 0; }
+.cms-preview-banner button { border-color: #dd1c26; background: #dd1c26; }
+.cms-preview-banner :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+body:has(.cms-preview-banner) { padding-top: 52px; }
 .contact-map-actions > a:focus-visible, .contact-map-slot button:focus-visible { outline: 3px solid var(--forest); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .partner-logo-panel img { transition: none; } }
+@media (max-width: 760px) { .cms-preview-banner { min-height: 76px; flex-wrap: wrap; justify-content: flex-start; gap: 7px 10px; } body:has(.cms-preview-banner) { padding-top: 76px; } }

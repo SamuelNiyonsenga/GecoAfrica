@@ -7,6 +7,7 @@ use App\Models\CmsMediaAsset;
 use App\Models\CmsSiteSetting;
 use App\Models\ContactMessage;
 use App\Models\CmsContentEntry;
+use App\Support\MediaUsage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,12 @@ class CmsSystemController
 {
     public function media(Request $request): View
     {
-        return view('admin.system.media', ['assets' => CmsMediaAsset::query()->orderByDesc('created_at')->paginate(36)]);
+        $assets = CmsMediaAsset::query()->orderByDesc('created_at')->paginate(36);
+        $assets->getCollection()->transform(function (CmsMediaAsset $asset): CmsMediaAsset {
+            $asset->setAttribute('usage_count', MediaUsage::count($asset));
+            return $asset;
+        });
+        return view('admin.system.media', compact('assets'));
     }
 
     public function uploadMedia(Request $request): RedirectResponse
@@ -33,6 +39,10 @@ class CmsSystemController
 
     public function deleteMedia(Request $request, CmsMediaAsset $asset): RedirectResponse
     {
+        $usageCount = MediaUsage::count($asset);
+        if ($usageCount > 0 && ! $request->boolean('confirm_used')) {
+            return back()->with('media_confirmation', ['id' => $asset->id, 'count' => $usageCount]);
+        }
         $asset->delete();
         $this->audit($request, 'media.trash', 'media', (string) $asset->id);
         return back()->with('success', 'Media moved to Trash. The stored file was kept.');

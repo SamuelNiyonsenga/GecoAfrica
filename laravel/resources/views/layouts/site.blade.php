@@ -37,11 +37,23 @@
     @php
         $siteSettings = $cmsSiteSettings ?? [];
         $sitePhones = is_array($siteSettings['phone_numbers'] ?? null) ? array_values($siteSettings['phone_numbers']) : [];
-        $primaryPhone = $sitePhones[0] ?? '+250 788 842 990';
-        $secondaryPhone = $sitePhones[1] ?? '+250 788 572 346';
-        $publicEmail = $siteSettings['public_email'] ?? 'info@gecoafrica.com';
+        $primaryPhone = $sitePrimaryPhone ?? ($sitePhones[0] ?? '+250 788 842 990');
+        $secondaryPhone = $siteSecondaryPhone ?? ($sitePhones[1] ?? '+250 788 572 346');
+        $publicEmail = $sitePublicEmail ?? ($siteSettings['public_email'] ?? 'info@gecoafrica.com');
     @endphp
     <a class="skip-link" href="#main-content">Skip to content</a>
+    @if (!empty($cmsPreview) && $cmsPreview->active())
+        <aside class="cms-preview-banner" role="status">
+            <strong>Preview — this version is not published yet</strong>
+            @if ($cmsPreview->pageKey())
+                <a href="{{ route('admin.pages.edit', $cmsPreview->pageKey()) }}">Back to editor</a>
+                <form method="post" action="{{ route('admin.pages.publish', $cmsPreview->pageKey()) }}">@csrf<button type="submit">Publish now</button></form>
+            @elseif ($cmsPreview->entryId() && $cmsPreview->section())
+                <a href="{{ route('admin.content.edit', [$cmsPreview->section(), $cmsPreview->entryId()]) }}">Back to editor</a>
+                <form method="post" action="{{ route('admin.content.publish', [$cmsPreview->section(), $cmsPreview->entryId()]) }}">@csrf @method('PUT')<button type="submit">Publish now</button></form>
+            @endif
+        </aside>
+    @endif
     <!-- TODO(client): provide a crisp SVG GECO logo in full-colour and white versions to replace the current 203×167 PNG, whose embedded tagline is not legible at small sizes. -->
 
     <div class="utility-bar">
@@ -119,7 +131,7 @@
                 <a href="mailto:{{ $publicEmail }}">{{ $publicEmail }}</a>
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a>
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $secondaryPhone) }}">{{ $secondaryPhone }}</a>
-                <span>{{ $siteSettings['address'] ?? 'Avenue des Poids Lourds, Source Oil Petrol Station building' }}<br>P.O. Box {{ $siteSettings['po_box'] ?? '3711' }}, {{ $siteSettings['city'] ?? 'Kigali' }}, {{ $siteSettings['country'] ?? 'Rwanda' }}</span>
+                <span>{{ $siteAddress ?? ($siteSettings['address'] ?? 'Avenue des Poids Lourds, Source Oil Petrol Station building') }}<br>P.O. Box {{ $sitePoBox ?? ($siteSettings['po_box'] ?? '3711') }}, {{ $siteCity ?? ($siteSettings['city'] ?? 'Kigali') }}, {{ $siteCountry ?? ($siteSettings['country'] ?? 'Rwanda') }}</span>
                 @php($socialLinks = is_array($siteSettings['social_links'] ?? null) ? $siteSettings['social_links'] : [])
                 @if ($socialLinks)
                     <nav class="footer-social" aria-label="Social media">

@@ -15,7 +15,7 @@
                     <p>From understanding the ground to designing roads and buildings, GECO brings technical services together to help projects move forward with clarity.</p>
                     <div class="hero-actions">
                         <a class="button button-dark" href="#service-list">Explore our services <span aria-hidden="true">↓</span></a>
-                        <a class="text-link" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Talk to our team <span aria-hidden="true">→</span></a>
+                        <a class="text-link" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Talk to our team <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@
                             </a>
                         @endif
 
-                        <a class="service-enquiry-link" href="mailto:info@gecoafrica.com?subject=Enquiry%20about%20{{ rawurlencode($service['title']) }}">Discuss this service <span aria-hidden="true">→</span></a>
+                            <a class="service-enquiry-link" href="mailto:{{ $sitePublicEmail }}?subject=Enquiry%20about%20{{ rawurlencode($service['title']) }}">Discuss this service <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </section>
@@ -93,8 +93,8 @@
             </div>
             <div class="services-contact-action">
                 <p>Share a little about your project and the technical support you need. Our team can help you identify a useful next step.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Enquire about our services <span aria-hidden="true">↗</span></a>
-                <a class="contact-phone" href="tel:+250788842990">Or call <strong>+250 788 842 990</strong></a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Enquire about our services <span aria-hidden="true">↗</span></a>
+                <a class="contact-phone" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">Or call <strong>{{ $sitePrimaryPhone }}</strong></a>
                 <a class="services-about-link" href="{{ route('about') }}">Learn more about GECO Africa <span aria-hidden="true">→</span></a>
             </div>
             <svg class="contact-contour" viewBox="0 0 300 260" fill="none" aria-hidden="true"><path d="M296 9C224 6 151 15 93 47 36 78 10 119 8 157c-2 37 30 66 71 82 43 17 106 17 161 10M296 42c-61-1-119 8-165 33-46 26-66 58-66 86 0 28 23 48 56 61 34 12 82 13 124 8M295 77c-49 1-92 8-126 27-34 19-48 42-47 62 1 18 17 32 42 41 25 9 60 9 91 5M294 112c-35 2-64 8-87 20-22 13-31 27-29 39 2 12 13 21 31 27 17 5 39 6 58 3"/></svg>

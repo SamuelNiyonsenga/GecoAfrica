@@ -87,8 +87,8 @@
             </div>
             <div>
                 <p>Talk with GECO Africa about geotechnical investigation, engineering design and project delivery in Rwanda.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Contact GECO Africa <span aria-hidden="true">↗</span></a>
-                <a class="partners-phone-link" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Contact GECO Africa <span aria-hidden="true">↗</span></a>
+                <a class="partners-phone-link" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

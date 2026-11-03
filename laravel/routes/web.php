@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\CmsContentController;
 use App\Http\Controllers\Admin\CmsPageController;
+use App\Http\Controllers\Admin\CmsPreviewController;
 use App\Http\Controllers\Admin\CmsSystemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
@@ -50,6 +51,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/trash/content/{entry}/restore', [CmsSystemController::class, 'restoreContent'])->name('trash.content.restore');
         Route::post('/trash/media/{asset}/restore', [CmsSystemController::class, 'restoreMedia'])->name('trash.media.restore');
         Route::get('/pages', [CmsPageController::class, 'index'])->name('pages.index');
+        Route::get('/pages/{pageKey}/preview', [CmsPreviewController::class, 'page'])->name('pages.preview');
         Route::get('/pages/{pageKey}', [CmsPageController::class, 'edit'])->name('pages.edit');
         Route::post('/pages/{pageKey}/draft', [CmsPageController::class, 'saveDraft'])->name('pages.draft');
         Route::post('/pages/{pageKey}/publish', [CmsPageController::class, 'publish'])->name('pages.publish');
@@ -62,6 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/content/{section}', [CmsContentController::class, 'index'])->name('content.index');
         Route::get('/content/{section}/create', [CmsContentController::class, 'create'])->name('content.create');
         Route::post('/content/{section}', [CmsContentController::class, 'store'])->name('content.store');
+        Route::get('/content/{section}/{entry}/preview', [CmsPreviewController::class, 'content'])->name('content.preview');
         Route::get('/content/{section}/{entry}/edit', [CmsContentController::class, 'edit'])->name('content.edit');
         Route::put('/content/{section}/{entry}', [CmsContentController::class, 'update'])->name('content.update');
         Route::put('/content/{section}/{entry}/publish', [CmsContentController::class, 'publish'])->name('content.publish');

@@ -31,6 +31,7 @@ class CmsPageController
         $page = CmsPage::query()->firstOrCreate(['page_key' => $pageKey]);
         $translation = $page->translations()->firstOrCreate(['locale_code' => 'en'], ['draft_fields' => [], 'published_fields' => null]);
         $fields = $translation->draft_fields ?? [];
+        unset($fields['structuredData']);
         $sectionSettings = [];
         if ($pageKey === 'home') {
             foreach (self::HOME_SECTIONS as $key => $label) {
@@ -51,6 +52,7 @@ class CmsPageController
         $translation->fill(['draft_fields' => $fields])->save();
         $page->update(['updated_by' => $request->user()->id]);
         $this->audit($request, 'page.draft', $pageKey);
+        if ($request->input('intent') === 'preview') return to_route('admin.pages.preview', $pageKey);
         return to_route('admin.pages.edit', $pageKey)->with('success', 'Page draft saved.');
     }
 
@@ -94,7 +96,7 @@ class CmsPageController
     {
         $currentPage = CmsPage::query()->where('page_key', $pageKey)->with('translations')->first();
         $current = $currentPage?->draftFields('en') ?? [];
-        unset($current['homeSections']);
+        unset($current['homeSections'], $current['structuredData']);
         $submitted = $request->input('fields', []);
         if (!is_array($submitted)) throw \Illuminate\Validation\ValidationException::withMessages(['fields' => 'Enter page content and try again.']);
         $fields = [];

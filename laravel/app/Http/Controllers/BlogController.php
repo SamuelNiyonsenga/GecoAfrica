@@ -45,19 +45,6 @@ class BlogController extends Controller
             'canonicalUrl' => 'https://gecoafrica.com/blog/',
             'ogImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
             'ogImageAlt' => 'Geotechnical field investigation by GECO Africa',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'Engineering Insights | GECO Africa',
-                'url' => 'https://gecoafrica.com/blog/',
-                'description' => 'Practical engineering guides from GECO Africa.',
-                'publisher' => ['@id' => 'https://gecoafrica.com/#organization'],
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($articles),
-                    'itemListElement' => $itemList,
-                ],
-            ],
             'articles' => $articles,
             'categories' => $categories,
             'categoryCounts' => $categoryCounts,
@@ -86,17 +73,6 @@ class BlogController extends Controller
             'canonicalUrl' => 'https://gecoafrica.com/blog/'.$article['slug'].'/',
             'ogImage' => 'https://gecoafrica.com/'.$article['image'],
             'ogImageAlt' => $article['imageAlt'],
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'BlogPosting',
-                'headline' => $article['title'],
-                'description' => $article['summary'],
-                'image' => 'https://gecoafrica.com/'.$article['image'],
-                'mainEntityOfPage' => 'https://gecoafrica.com/blog/'.$article['slug'].'/',
-                'author' => ['@id' => 'https://gecoafrica.com/#organization'],
-                'publisher' => ['@id' => 'https://gecoafrica.com/#organization'],
-                'articleSection' => $article['category'],
-            ],
         ]);
     }
 }

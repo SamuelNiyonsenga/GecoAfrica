@@ -15,7 +15,7 @@
                     <p class="about-hero-intro">GECO Africa Ltd is a civil engineering consultancy and construction company established in 2007 and registered as GECO Africa Ltd in 2009. We bring local knowledge and technical expertise to the infrastructure that connects communities and supports growth.</p>
                     <div class="hero-actions">
                         <a class="button button-dark" href="#our-story">Discover our story <span aria-hidden="true">↓</span></a>
-                        <a class="text-link" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Discuss a project <span aria-hidden="true">→</span></a>
+                        <a class="text-link" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Discuss a project <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
 
@@ -43,7 +43,7 @@
                 <p>GECO began as an independent engineering practice and grew into a Rwandan-owned civil engineering consultancy serving projects across the country.</p>
                 <div class="about-location-card">
                     <span class="location-pin" aria-hidden="true">⌖</span>
-                    <span><small>Our office</small><strong>Avenue des Poids Lourds<br>Kigali, Rwanda</strong><em>Source Oil Petrol Station building</em></span>
+                    <span><small>Our office</small><strong>{{ $siteAddress }}<br>{{ $siteCity }}, {{ $siteCountry }}</strong><em>{{ $sitePoBox ? 'P.O. Box '.$sitePoBox : '' }}</em></span>
                 </div>
             </div>
 
@@ -180,8 +180,8 @@
     <section class="about-contact-strip">
         <div class="site-container about-contact-inner">
             <p>Planning a project in Rwanda?</p>
-            <a href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
-            <span>+250 788 842 990</span>
+            <a href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
+            <span>{{ $sitePrimaryPhone }}</span>
         </div>
     </section>
 </main>

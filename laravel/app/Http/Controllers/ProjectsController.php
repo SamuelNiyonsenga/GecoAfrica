@@ -34,18 +34,6 @@ class ProjectsController extends Controller
             'ogImage' => 'https://gecoafrica.com/images/projects/nyanza-asphalt-road.jpg',
             'ogImageAlt' => 'Asphalt road project in Rwanda',
             'preloadImage' => 'https://gecoafrica.com/images/projects/nyanza-asphalt-road.jpg',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'Project References | GECO Africa',
-                'url' => 'https://gecoafrica.com/projects/',
-                'description' => 'A selection of GECO Africa’s engineering project references in Rwanda and the region.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => CmsContentRepository::referenceCount(),
-                    'itemListElement' => $items,
-                ],
-            ],
             'featuredProjects' => CmsContentRepository::featuredProjects(),
             'projectGroups' => $groups,
             'selectedExperience' => CmsContentRepository::selectedExperience(),

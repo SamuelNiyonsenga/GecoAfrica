@@ -113,8 +113,8 @@
             </div>
             <div>
                 <p>Speak with our team about geotechnical investigation, engineering design or project delivery.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Contact our team <span aria-hidden="true">↗</span></a>
-                <a class="team-phone-link" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Contact our team <span aria-hidden="true">↗</span></a>
+                <a class="team-phone-link" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

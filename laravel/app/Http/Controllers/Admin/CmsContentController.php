@@ -91,6 +91,7 @@ class CmsContentController extends Controller
             'definition' => $definition,
             'entry' => $entry,
             'fields' => $entry->draftFields('en'),
+            'trashedMediaFields' => $this->trashedMediaFields($definition, $entry->draftFields('en')),
             'assets' => $this->mediaOptions(),
             'parents' => $this->parents($definition),
             'versions' => CmsContentVersion::query()->where('entity_type', 'content')->where('entity_key', (string) $entry->id)->latest('created_at')->limit(30)->get(),
@@ -111,6 +112,8 @@ class CmsContentController extends Controller
             $translation->save();
         });
         $this->audit($request, 'content.save-draft', $entry);
+
+        if ($request->input('intent') === 'preview') return to_route('admin.content.preview', [$section, $entry]);
 
         return back()->with('success', 'Draft saved. Visitors will continue to see the published version until you publish.');
     }
@@ -269,13 +272,25 @@ class CmsContentController extends Controller
             }
             if ($spec['type'] === 'media' && $value !== '') {
                 $mediaPath = str_starts_with($value, 'storage/') ? substr($value, 8) : $value;
-                if (!CmsMediaAsset::query()->where('path', $mediaPath)->exists()) {
+                $asset = CmsMediaAsset::withTrashed()->where('path', $mediaPath)->first();
+                if (!$asset || ($asset->trashed() && ($existing[$key] ?? null) !== $value)) {
                     throw ValidationException::withMessages(['fields.'.$key => 'Choose a file from the media library.']);
                 }
             }
             $fields[$key] = $value;
         }
         return $fields;
+    }
+
+    private function trashedMediaFields(array $definition, array $fields): array
+    {
+        $trashed = [];
+        foreach ($definition['fields'] as $key => $spec) {
+            if (($spec['type'] ?? null) !== 'media' || empty($fields[$key])) continue;
+            $path = str_starts_with($fields[$key], 'storage/') ? substr($fields[$key], 8) : $fields[$key];
+            if (CmsMediaAsset::withTrashed()->where('path', $path)->first()?->trashed()) $trashed[$key] = true;
+        }
+        return $trashed;
     }
 
     private function validatePublish(CmsContentEntry $entry, array $fields, array $definition): void

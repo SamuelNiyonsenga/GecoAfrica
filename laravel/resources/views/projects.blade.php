@@ -153,8 +153,8 @@
             </div>
             <div>
                 <p>Talk with our team about a site, road, building or infrastructure challenge.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Discuss your project <span aria-hidden="true">↗</span></a>
-                <a class="projects-contact-phone" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Discuss your project <span aria-hidden="true">↗</span></a>
+                <a class="projects-contact-phone" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

@@ -23,18 +23,6 @@ class ActivitiesController extends Controller
             'canonicalUrl' => 'https://gecoafrica.com/activities/',
             'ogImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
             'ogImageAlt' => 'GECO Africa engineering team working on a site investigation in Rwanda',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'GECO Africa activities and engineering assignments',
-                'url' => 'https://gecoafrica.com/activities/',
-                'description' => 'GECO Africa engineering assignments across Rwanda.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($activities),
-                    'itemListElement' => $activityItems,
-                ],
-            ],
             'activities' => $activities,
             'categories' => array_values(array_unique(array_column($activities, 'category'))),
         ]);

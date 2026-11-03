@@ -21,28 +21,6 @@ class ContactController extends Controller
             'canonicalUrl' => 'https://gecoafrica.com/contact/',
             'ogImage' => 'https://gecoafrica.com/images/home/fieldwork-drilling.webp',
             'ogImageAlt' => 'GECO Africa geotechnical fieldwork in Rwanda',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'ContactPage',
-                'name' => 'Contact GECO Africa',
-                'url' => 'https://gecoafrica.com/contact/',
-                'description' => 'Contact GECO Africa Ltd in Kigali, Rwanda.',
-                'mainEntity' => [
-                    '@id' => 'https://gecoafrica.com/#organization',
-                    '@type' => 'Organization',
-                    'name' => 'GECO Africa Ltd',
-                    'url' => 'https://gecoafrica.com/',
-                    'email' => 'info@gecoafrica.com',
-                    'telephone' => ['+250 788 842 990', '+250 788 572 346'],
-                    'address' => [
-                        '@type' => 'PostalAddress',
-                        'streetAddress' => 'Avenue des Poids Lourds, Source Oil Petrol Station building',
-                        'postOfficeBoxNumber' => '3711',
-                        'addressLocality' => 'Kigali',
-                        'addressCountry' => 'RW',
-                    ],
-                ],
-            ],
         ]);
     }
 

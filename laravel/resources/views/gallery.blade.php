@@ -103,8 +103,8 @@
             </div>
             <div>
                 <p>Connect with GECO Africa about geotechnical investigation, engineering design and project supervision.</p>
-                <a class="button button-bright" href="mailto:info@gecoafrica.com?subject=Project%20enquiry">Start a project enquiry <span aria-hidden="true">↗</span></a>
-                <a class="gallery-phone-link" href="tel:+250788842990">+250 788 842 990</a>
+                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Start a project enquiry <span aria-hidden="true">↗</span></a>
+                <a class="gallery-phone-link" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">{{ $sitePrimaryPhone }}</a>
             </div>
         </div>
     </section>

@@ -45,6 +45,9 @@ class CmsContentEntry extends Model
     public function translatedFields(?string $locale = null): array
     {
         $translation = $this->translationFor($locale);
+        if (app(\App\Support\CmsPreview::class)->entryId() === $this->id) {
+            return $translation?->draft_fields ?? [];
+        }
         return $translation?->published_fields ?? [];
     }
 
@@ -64,6 +67,10 @@ class CmsContentEntry extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', 'published')->whereNotNull('published_at');
+        $entryId = app(\App\Support\CmsPreview::class)->entryId();
+        return $query->where(function (Builder $published) use ($entryId): void {
+            $published->where(fn (Builder $normal) => $normal->where('status', 'published')->whereNotNull('published_at'));
+            if ($entryId !== null) $published->orWhere('id', $entryId);
+        });
     }
 }

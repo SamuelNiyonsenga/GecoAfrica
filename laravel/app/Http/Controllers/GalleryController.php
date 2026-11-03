@@ -37,18 +37,6 @@ class GalleryController extends Controller
             'ogImage' => 'https://gecoafrica.com/images/gallery/bg_13.jpg',
             'ogImageAlt' => 'GECO Africa drilling and geotechnical fieldwork in Rwanda',
             'preloadImage' => 'https://gecoafrica.com/images/gallery/bg_13.jpg',
-            'structuredData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'CollectionPage',
-                'name' => 'Photo Gallery | GECO Africa',
-                'url' => 'https://gecoafrica.com/gallery/',
-                'description' => 'Photos of GECO Africa’s engineering projects, site work and laboratory activities.',
-                'mainEntity' => [
-                    '@type' => 'ItemList',
-                    'numberOfItems' => count($photos),
-                    'itemListElement' => $items,
-                ],
-            ],
             'photos' => $photos,
             'galleryFilters' => $filters,
         ]);
