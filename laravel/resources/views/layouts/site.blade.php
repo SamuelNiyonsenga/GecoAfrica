@@ -4,11 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#00376d">
-    <meta name="robots" content="index, follow, max-image-preview:large">
+    @hasSection('robots')<meta name="robots" content="@yield('robots')">@else<meta name="robots" content="index, follow, max-image-preview:large">@endif
     <title>{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}</title>
     <meta name="description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
     <link rel="canonical" href="{{ $canonicalUrl ?? 'https://gecoafrica.com/' }}">
-    <link rel="icon" href="{{ asset('images/geco-icon.jpg') }}" type="image/jpeg">
+    <link rel="preload" as="font" type="font/woff2" href="{{ asset('fonts/inter-latin-wght-normal.woff2') }}" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="{{ asset('fonts/source-serif-4-latin-wght-normal.woff2') }}" crossorigin>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon-32.png') }}" type="image/png" sizes="32x32">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" sizes="180x180">
     @if (!empty($preloadImage))
         <link rel="preload" as="image" href="{{ $preloadImage }}" fetchpriority="high">
     @endif
@@ -24,11 +29,11 @@
     <meta name="twitter:title" content="{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}">
     <meta name="twitter:description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
     <meta name="twitter:image" content="{{ $ogImage ?? 'https://gecoafrica.com/images/home/fieldwork-drilling.webp' }}">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
-    <script type="application/ld+json">@json($structuredData)</script>
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
+    @if (!empty($structuredData))<script type="application/ld+json">@json($structuredData)</script>@endif
     @stack('head')
 </head>
-<body>
+<body id="top">
     @php
         $siteSettings = $cmsSiteSettings ?? [];
         $sitePhones = is_array($siteSettings['phone_numbers'] ?? null) ? array_values($siteSettings['phone_numbers']) : [];
@@ -37,6 +42,7 @@
         $publicEmail = $siteSettings['public_email'] ?? 'info@gecoafrica.com';
     @endphp
     <a class="skip-link" href="#main-content">Skip to content</a>
+    <!-- TODO(client): provide a crisp SVG GECO logo in full-colour and white versions to replace the current 203×167 PNG, whose embedded tagline is not legible at small sizes. -->
 
     <div class="utility-bar">
         <div class="site-container utility-inner">
@@ -61,17 +67,26 @@
 
             <nav class="primary-navigation" id="primary-navigation" aria-label="Main navigation">
                 <a href="{{ route('home') }}" @class(['nav-current' => request()->routeIs('home')]) @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
-                <a href="{{ route('about') }}" @class(['nav-current' => request()->routeIs('about')]) @if(request()->routeIs('about')) aria-current="page" @endif>About</a>
+                <div class="nav-group {{ request()->routeIs('about', 'team', 'partners') ? 'nav-group-current' : '' }}">
+                    <a href="{{ route('about') }}" @class(['nav-current' => request()->routeIs('about', 'team', 'partners')]) @if(request()->routeIs('about', 'team', 'partners')) aria-current="page" @endif>About</a>
+                    <button class="nav-group-toggle" type="button" aria-label="Show About pages" aria-expanded="false" aria-controls="about-menu"><span aria-hidden="true">▾</span></button>
+                    <div class="nav-submenu" id="about-menu" hidden>
+                        <a href="{{ route('about') }}">About GECO</a><a href="{{ route('team') }}" @if(request()->routeIs('team')) aria-current="page" @endif>Team</a><a href="{{ route('partners') }}" @if(request()->routeIs('partners')) aria-current="page" @endif>Partners</a><a href="{{ route('home') }}#experience">Experience</a>
+                    </div>
+                </div>
                 <a href="{{ route('services') }}" @class(['nav-current' => request()->routeIs('services')]) @if(request()->routeIs('services')) aria-current="page" @endif>Services</a>
-                <a href="{{ route('projects') }}" @class(['nav-current' => request()->routeIs('projects')]) @if(request()->routeIs('projects')) aria-current="page" @endif>Projects</a>
+                <div class="nav-group {{ request()->routeIs('projects', 'activities') ? 'nav-group-current' : '' }}">
+                    <a href="{{ route('projects') }}" @class(['nav-current' => request()->routeIs('projects', 'activities')]) @if(request()->routeIs('projects', 'activities')) aria-current="page" @endif>Projects</a>
+                    <button class="nav-group-toggle" type="button" aria-label="Show project pages" aria-expanded="false" aria-controls="projects-menu"><span aria-hidden="true">▾</span></button>
+                    <div class="nav-submenu" id="projects-menu" hidden>
+                        <a href="{{ route('projects') }}">Project references</a><a href="{{ route('activities') }}" @if(request()->routeIs('activities')) aria-current="page" @endif>Activities</a>
+                    </div>
+                </div>
                 <a href="{{ route('gallery') }}" @class(['nav-current' => request()->routeIs('gallery')]) @if(request()->routeIs('gallery')) aria-current="page" @endif>Gallery</a>
-                <a href="{{ route('activities') }}" @class(['nav-current' => request()->routeIs('activities')]) @if(request()->routeIs('activities')) aria-current="page" @endif>Activities</a>
                 <a href="{{ route('blog') }}" @class(['nav-current' => request()->routeIs('blog', 'blog.show')]) @if(request()->routeIs('blog', 'blog.show')) aria-current="page" @endif>Insights</a>
-                <a href="{{ route('team') }}" @class(['nav-current' => request()->routeIs('team')]) @if(request()->routeIs('team')) aria-current="page" @endif>Team</a>
-                <a href="{{ route('partners') }}" @class(['nav-current' => request()->routeIs('partners')]) @if(request()->routeIs('partners')) aria-current="page" @endif>Partners</a>
-                <a href="{{ route('home') }}#experience">Experience</a>
                 <a href="{{ route('contact') }}" @class(['nav-current' => request()->routeIs('contact')]) @if(request()->routeIs('contact')) aria-current="page" @endif>Contact</a>
                 <a class="nav-cta" href="mailto:{{ $publicEmail }}?subject=Project%20enquiry">Start a conversation <span aria-hidden="true">↗</span></a>
+                <div class="mobile-nav-contact"><a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a><a href="mailto:{{ $publicEmail }}">{{ $publicEmail }}</a></div>
             </nav>
         </div>
     </header>
@@ -105,11 +120,23 @@
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $primaryPhone) }}">{{ $primaryPhone }}</a>
                 <a href="tel:{{ preg_replace('/[^0-9+]/', '', $secondaryPhone) }}">{{ $secondaryPhone }}</a>
                 <span>{{ $siteSettings['address'] ?? 'Avenue des Poids Lourds, Source Oil Petrol Station building' }}<br>P.O. Box {{ $siteSettings['po_box'] ?? '3711' }}, {{ $siteSettings['city'] ?? 'Kigali' }}, {{ $siteSettings['country'] ?? 'Rwanda' }}</span>
+                @php($socialLinks = is_array($siteSettings['social_links'] ?? null) ? $siteSettings['social_links'] : [])
+                @if ($socialLinks)
+                    <nav class="footer-social" aria-label="Social media">
+                        @foreach ($socialLinks as $socialName => $socialUrl)
+                            @php($socialParts = is_string($socialUrl) ? parse_url($socialUrl) : false)
+                            @if (is_string($socialUrl) && filter_var($socialUrl, FILTER_VALIDATE_URL) && in_array($socialParts['scheme'] ?? '', ['http', 'https'], true))
+                                <a href="{{ $socialUrl }}" aria-label="GECO Africa on {{ ucfirst((string) $socialName) }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.41l-9.3 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg></a>
+                            @endif
+                        @endforeach
+                    </nav>
+                @endif
             </div>
         </div>
         <div class="site-container footer-bottom">
             <span>© {{ date('Y') }} {{ $siteSettings['business_name'] ?? 'GECO Africa Ltd' }}. All rights reserved.</span>
             <span>Engineering &amp; construction consultancy · Rwanda</span>
+            <a class="back-to-top" href="#top">Back to top ↑</a>
         </div>
     </footer>
 

@@ -15,7 +15,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.site', function ($view): void {
-            $view->with('cmsSiteSettings', CmsSiteSetting::query()->find(1)?->fields ?? []);
+            try {
+                $settings = CmsSiteSetting::query()->find(1)?->fields ?? [];
+            } catch (\Throwable $exception) {
+                $settings = [];
+            }
+            $view->with('cmsSiteSettings', $settings);
         });
         View::composer(['home', 'about', 'contact', 'services', 'projects', 'team', 'partners', 'gallery', 'blog', 'activities'], function ($view): void {
             $viewName = $view->getName();
@@ -30,7 +35,11 @@ class AppServiceProvider extends ServiceProvider
                 $data['serviceScopes'] = CmsContentRepository::services();
                 $data['team'] = CmsContentRepository::coreTeam();
             }
-            $data['cmsSiteSettings'] = CmsSiteSetting::query()->find(1)?->fields ?? [];
+            try {
+                $data['cmsSiteSettings'] = CmsSiteSetting::query()->find(1)?->fields ?? [];
+            } catch (\Throwable $exception) {
+                $data['cmsSiteSettings'] = [];
+            }
             $view->with($data);
         });
     }
