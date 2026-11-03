@@ -57,6 +57,10 @@ class CmsContentController extends Controller
     public function store(Request $request, string $section): RedirectResponse
     {
         $definition = $this->definition($section);
+        if (blank($request->input('slug'))) {
+            $title = $request->input('fields.title', $request->input('fields.name', ''));
+            $request->merge(['slug' => Str::slug((string) $title)]);
+        }
         $meta = $this->validateMeta($request, $definition, null);
         $fields = $this->validateFields($request, $definition);
         $publish = $request->input('intent') === 'publish';

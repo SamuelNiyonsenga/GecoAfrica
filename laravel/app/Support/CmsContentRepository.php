@@ -10,6 +10,7 @@ use App\Data\ProjectsCatalog;
 use App\Data\ServicesCatalog;
 use App\Data\TeamCatalog;
 use App\Models\CmsContentEntry;
+use App\Models\CmsMediaAsset;
 
 class CmsContentRepository
 {
@@ -132,6 +133,12 @@ class CmsContentRepository
     private static function fields(CmsContentEntry $entry, string $locale = 'en'): array
     {
         $fields = $entry->translatedFields($locale);
+        foreach ([['image', 'imageAlt'], ['coverImage', 'coverImageAlt'], ['portrait', 'alt']] as [$imageKey, $altKey]) {
+            if (!empty($fields[$imageKey]) && empty($fields[$altKey])) {
+                $path = str_starts_with($fields[$imageKey], 'storage/') ? substr($fields[$imageKey], 8) : $fields[$imageKey];
+                $fields[$altKey] = CmsMediaAsset::query()->where('path', $path)->value('alt_text') ?? '';
+            }
+        }
         $fields['slug'] = $entry->slug;
         $fields['cmsId'] = $entry->id;
         return $fields;

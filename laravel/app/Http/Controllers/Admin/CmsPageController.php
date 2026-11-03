@@ -113,7 +113,7 @@ class CmsPageController
                 $fields[$key] = trim((string) $raw);
             }
         }
-        return $fields;
+        return array_replace($generated ?? [], $fields);
     }
     private function version(string $key, array $fields, string $note): void
     {

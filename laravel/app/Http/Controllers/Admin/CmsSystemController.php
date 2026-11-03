@@ -9,6 +9,7 @@ use App\Models\ContactMessage;
 use App\Models\CmsContentEntry;
 use App\Support\MediaUsage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -17,26 +18,33 @@ class CmsSystemController
 {
     public function media(Request $request): View
     {
-        $assets = CmsMediaAsset::query()->orderByDesc('created_at')->paginate(36);
+        $query = CmsMediaAsset::query()->orderByDesc('created_at');
+        if ($request->filled('q')) $query->where('original_name', 'like', '%'.$request->string('q').'%');
+        if (in_array($request->input('type'), ['images', 'documents', 'video'], true)) {
+            $mime = ['images' => 'image/', 'documents' => 'application/pdf', 'video' => 'video/'][$request->input('type')];
+            str_ends_with($mime, '/') ? $query->where('mime_type', 'like', $mime.'%') : $query->where('mime_type', $mime);
+        }
+        $assets = $query->paginate(36)->withQueryString();
         $assets->getCollection()->transform(function (CmsMediaAsset $asset): CmsMediaAsset {
             $asset->setAttribute('usage_count', MediaUsage::count($asset));
             return $asset;
         });
         return view('admin.system.media', compact('assets'));
     }
-
-    public function uploadMedia(Request $request): RedirectResponse
+    public function uploadMedia(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate(['files' => ['required', 'array', 'max:20'], 'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,pdf,mp4,webm,mov', 'max:51200']]);
+        $uploaded = [];
         foreach ($data['files'] as $file) {
             $path = $file->store('cms/'.now()->format('Y/m'), 'public');
             [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
-            CmsMediaAsset::query()->create(['disk' => 'public', 'path' => $path, 'original_name' => $file->getClientOriginalName(), 'mime_type' => $file->getMimeType() ?: 'application/octet-stream', 'size_bytes' => $file->getSize(), 'width' => $width, 'height' => $height, 'uploaded_by' => $request->user()->id]);
+            $asset = CmsMediaAsset::query()->create(['disk' => 'public', 'path' => $path, 'original_name' => $file->getClientOriginalName(), 'mime_type' => $file->getMimeType() ?: 'application/octet-stream', 'size_bytes' => $file->getSize(), 'width' => $width, 'height' => $height, 'uploaded_by' => $request->user()->id]);
+            $uploaded[] = ['id' => $asset->id, 'name' => $asset->original_name, 'mime' => $asset->mime_type, 'url' => $asset->publicUrl(), 'value' => 'storage/'.$asset->path, 'alt_text' => null];
         }
         $this->audit($request, 'media.upload', 'media', (string) count($data['files']));
+        if ($request->expectsJson()) return response()->json(['items' => $uploaded]);
         return back()->with('success', 'Media uploaded. Select it in a content item to use it on the website.');
     }
-
     public function deleteMedia(Request $request, CmsMediaAsset $asset): RedirectResponse
     {
         $usageCount = MediaUsage::count($asset);
@@ -48,6 +56,24 @@ class CmsSystemController
         return back()->with('success', 'Media moved to Trash. The stored file was kept.');
     }
 
+    public function mediaPicker(Request $request): JsonResponse
+    {
+        $query = CmsMediaAsset::query()->orderByDesc('created_at');
+        if ($request->filled('q')) $query->where('original_name', 'like', '%'.$request->string('q').'%');
+        if (in_array($request->input('type'), ['images', 'documents', 'video'], true)) {
+            $mime = ['images' => 'image/', 'documents' => 'application/pdf', 'video' => 'video/'][$request->input('type')];
+            str_ends_with($mime, '/') ? $query->where('mime_type', 'like', $mime.'%') : $query->where('mime_type', $mime);
+        }
+        $items = $query->paginate(24);
+        return response()->json(['items' => $items->getCollection()->map(fn (CmsMediaAsset $asset) => ['id' => $asset->id, 'name' => $asset->original_name, 'mime' => $asset->mime_type, 'url' => $asset->publicUrl(), 'value' => $asset->disk === 'legacy-public' ? $asset->path : 'storage/'.$asset->path, 'alt_text' => $asset->alt_text]), 'next_page_url' => $items->nextPageUrl()]);
+    }
+
+    public function updateMediaAlt(Request $request, CmsMediaAsset $asset): RedirectResponse
+    {
+        $data = $request->validate(['alt_text' => ['nullable', 'string', 'max:1000']]);
+        $asset->update(['alt_text' => trim($data['alt_text'] ?? '') ?: null]);
+        return back()->with('success', 'Image description saved.');
+    }
     public function settings(): View
     {
         $settings = CmsSiteSetting::query()->find(1);

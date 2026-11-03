@@ -6,7 +6,7 @@ class CmsContentTypes
 {
     public static function all(): array
     {
-        return [
+        $types = [
             'services' => ['type' => 'service', 'label' => 'Services', 'singular' => 'service', 'fields' => [
                 'number' => ['label' => 'Display number', 'type' => 'text'],
                 'title' => ['label' => 'Service name', 'type' => 'text', 'required' => true],
@@ -101,6 +101,35 @@ class CmsContentTypes
                 'location' => ['label' => 'Location', 'type' => 'text'],
             ]],
         ];
+
+        $hints = [
+            'number' => 'Small marker shown before this item in homepage and service sections.',
+            'title' => 'Main heading visitors see for this item.',
+            'name' => 'Name visitors see in cards and detail pages.',
+            'shortName' => 'Compact name used where a full name would not fit.',
+            'role' => 'Role displayed below the team member name.',
+            'initials' => 'Letters used in the portrait placeholder when no photo is set.',
+            'profile' => 'Short profile note displayed in the team listing.',
+            'focus' => 'Professional focus shown in the team profile.',
+            'experience' => 'Experience detail shown in the team profile.',
+            'image' => 'Photo or logo displayed on the public website.',
+            'imageAlt' => 'Accessible description read by screen readers for the image.',
+            'alt' => 'Accessible description read by screen readers for the image.',
+            'summary' => 'Short description shown in listings and search previews.',
+            'intro' => 'Introductory copy shown at the top of this page or detail.',
+            'items' => 'The service inclusions listed on its public detail page.',
+            'tags' => 'Small service labels shown on the card and detail page.',
+            'website' => 'External website visitors can open from this partner profile.',
+            'sections' => 'Article headings and paragraphs shown in the article body.',
+        ];
+        foreach ($types as &$type) {
+            foreach ($type['fields'] as $key => &$field) {
+                $field['hint'] ??= $hints[$key] ?? 'Shown with this item on the public website.';
+            }
+            unset($field);
+        }
+        unset($type);
+        return $types;
     }
 
     public static function get(string $section): ?array

@@ -40,6 +40,8 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
         Route::get('/', AdminDashboardController::class)->name('dashboard');
         Route::get('/media', [CmsSystemController::class, 'media'])->name('media.index');
+        Route::get('/media/picker', [CmsSystemController::class, 'mediaPicker'])->name('media.picker');
+        Route::patch('/media/{asset}/alt', [CmsSystemController::class, 'updateMediaAlt'])->name('media.alt');
         Route::post('/media', [CmsSystemController::class, 'uploadMedia'])->name('media.upload');
         Route::delete('/media/{asset}', [CmsSystemController::class, 'deleteMedia'])->name('media.delete');
         Route::get('/settings', [CmsSystemController::class, 'settings'])->name('settings.edit');

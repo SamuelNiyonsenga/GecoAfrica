@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        View::composer('layouts.admin', function ($view): void {
+            try { $view->with('adminNewEnquiries', \App\Models\ContactMessage::query()->where('status', 'new')->count()); }
+            catch (\Throwable) { $view->with('adminNewEnquiries', 0); }
+        });
         View::composer('layouts.site', function ($view): void {
             try {
                 $settings = CmsSiteSetting::query()->find(1)?->fields ?? [];
