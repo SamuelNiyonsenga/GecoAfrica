@@ -16,6 +16,12 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Hide the whole site from search engines (preview/staging copies, e.g. a
+    | subdomain the client uses to compare against the live site).
+    */
+    'noindex' => (bool) env('APP_NOINDEX', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

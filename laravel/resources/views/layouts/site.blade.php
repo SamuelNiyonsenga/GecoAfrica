@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @if (config('app.noindex'))<meta name="robots" content="noindex, nofollow">@endif
     <meta name="theme-color" content="#00376d">
     @hasSection('robots')<meta name="robots" content="@yield('robots')">@else<meta name="robots" content="index, follow, max-image-preview:large">@endif
     <title>{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}</title>
@@ -113,6 +114,18 @@
                     <img class="brand-logo" src="{{ asset('images/geco-logo.png') }}" width="84" height="84" alt="GECO Africa — Geotechnical Engineering Construction Company">
                 </a>
                 <p>Grounded in local knowledge.<br>Built for lasting impact.</p>
+                @php($socialNames = ['linkedin' => 'LinkedIn', 'facebook' => 'Facebook', 'instagram' => 'Instagram', 'youtube' => 'YouTube', 'x' => 'X'])
+                @php($socialLinks = collect(is_array($siteSettings['social_links'] ?? null) ? $siteSettings['social_links'] : [])->filter(fn ($url) => is_string($url) && filter_var($url, FILTER_VALIDATE_URL) && in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'], true)))
+                {{-- Links appear once they are filled in under Admin → Site settings. TODO(client): provide GECO's social media addresses. --}}
+                @if ($socialLinks->isNotEmpty())
+                    <nav class="footer-social" aria-label="GECO Africa on social media">
+                        @foreach ($socialNames as $socialKey => $socialLabel)
+                            @if ($socialLinks->has($socialKey))
+                                <a href="{{ $socialLinks[$socialKey] }}" target="_blank" rel="noopener noreferrer">{{ $socialLabel }} <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+                            @endif
+                        @endforeach
+                    </nav>
+                @endif
             </div>
             <div class="footer-column">
                 <span class="footer-label">Explore</span>
@@ -126,6 +139,14 @@
                 <a href="{{ route('partners') }}">Our partners</a>
                 <a href="{{ route('home') }}#experience">Our experience</a>
             </div>
+            @if (!empty($footerServices))
+            <div class="footer-column footer-services">
+                <span class="footer-label">Our services</span>
+                @foreach ($footerServices as $footerService)
+                    <a href="{{ route('services') }}{{ $footerService['slug'] !== '' ? '#'.$footerService['slug'] : '' }}">{{ $footerService['title'] }}</a>
+                @endforeach
+            </div>
+            @endif
             <div class="footer-column footer-contact">
                 <span class="footer-label">Get in touch</span>
                 <a href="{{ route('contact') }}">Contact page</a>
@@ -136,17 +157,6 @@
                 @php($openingHours = array_values(array_filter(is_array($siteSettings['opening_hours'] ?? null) ? $siteSettings['opening_hours'] : [])))
                 @if ($openingHours)
                     <span class="footer-hours">@foreach ($openingHours as $line){{ $line }}@if(!$loop->last)<br>@endif @endforeach</span>
-                @endif
-                @php($socialLinks = is_array($siteSettings['social_links'] ?? null) ? $siteSettings['social_links'] : [])
-                @if ($socialLinks)
-                    <nav class="footer-social" aria-label="Social media">
-                        @foreach ($socialLinks as $socialName => $socialUrl)
-                            @php($socialParts = is_string($socialUrl) ? parse_url($socialUrl) : false)
-                            @if (is_string($socialUrl) && filter_var($socialUrl, FILTER_VALIDATE_URL) && in_array($socialParts['scheme'] ?? '', ['http', 'https'], true))
-                                <a href="{{ $socialUrl }}" aria-label="GECO Africa on {{ ucfirst((string) $socialName) }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3h7v7h-2V6.41l-9.3 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z"/></svg></a>
-                            @endif
-                        @endforeach
-                    </nav>
                 @endif
             </div>
         </div>

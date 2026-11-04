@@ -2116,3 +2116,41 @@ body.menu-open .menu-toggle { position: relative; z-index: 52; }
 @media (min-width: 1181px) and (max-width: 1240px) {
     .primary-navigation { gap: 14px; font-size: 14px; }
 }
+
+/* ---- Hero: smaller headline (two lines instead of three) and a shorter section ---- */
+.home-showcase { height: min(690px, calc(100svh - 110px)); min-height: 600px; }
+.home-showcase-content { padding-top: 46px; padding-bottom: 118px; }
+.home-showcase-kicker { margin-bottom: 18px; }
+.home-showcase-title { max-width: 940px; font-size: clamp(50px, 5.2vw, 74px); line-height: 1.03; letter-spacing: -.045em; }
+.home-showcase-description { margin-top: 18px; line-height: 1.7; }
+.home-showcase-actions { margin-top: 24px; }
+@media (max-width: 1120px) {
+    .home-showcase-title { font-size: clamp(48px, 6vw, 64px); }
+}
+@media (max-width: 800px) {
+    .home-showcase { height: min(700px, calc(100svh - 84px)); min-height: 620px; }
+    .home-showcase-content { padding-top: 34px; padding-bottom: 116px; }
+    .home-showcase-title { font-size: clamp(42px, 7.6vw, 58px); }
+}
+@media (max-width: 560px) {
+    .home-showcase { height: auto; min-height: 640px; }
+    .home-showcase-content { padding-top: 36px; padding-bottom: 128px; }
+    .home-showcase-title { font-size: clamp(38px, 10.4vw, 46px); line-height: 1.05; }
+}
+
+/* ---- Footer: brand + social | Explore | Our services | Get in touch ---- */
+.footer-main { grid-template-columns: minmax(0, 1.3fr) minmax(0, .8fr) minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px; }
+.footer-services a { line-height: 1.4; }
+.footer-social { gap: 8px; margin-top: 22px; }
+.footer-social a { display: inline-flex; width: auto; height: auto; min-height: 36px; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid rgba(255,255,255,.35); color: #fff; font-size: var(--fs-caption); font-weight: 700; letter-spacing: .02em; }
+.footer-social a span[aria-hidden] { color: var(--accent-on-dark); }
+.footer-social a:hover { color: var(--forest-deep); background: #fff; border-color: #fff; }
+.footer-social a:hover span[aria-hidden] { color: #c4141c; }
+@media (max-width: 1120px) {
+    .footer-main { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px 28px; }
+    .footer-brand-block { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+    .footer-main { grid-template-columns: 1fr 1fr; gap: 30px 20px; }
+    .footer-contact { grid-column: 1 / -1; }
+}

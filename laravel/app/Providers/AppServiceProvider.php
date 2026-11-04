@@ -34,6 +34,16 @@ class AppServiceProvider extends ServiceProvider
             $pageKey = (string) ($data['cmsPageKey'] ?? 'home');
             $view->with('structuredData', StructuredData::forPage($data, $settings, $pageKey));
             $view->with('cmsPreview', app(CmsPreview::class));
+            // Footer "Our services" column follows the services managed in the CMS.
+            try {
+                $footerServices = array_values(array_filter(array_map(
+                    static fn (array $service): array => ['title' => (string) ($service['title'] ?? ''), 'slug' => (string) ($service['slug'] ?? '')],
+                    CmsContentRepository::services()
+                ), static fn (array $service): bool => $service['title'] !== ''));
+            } catch (\Throwable $exception) {
+                $footerServices = [];
+            }
+            $view->with('footerServices', $footerServices);
         });
         View::composer(['home', 'about', 'contact', 'services', 'projects', 'team', 'partners', 'gallery', 'blog', 'activities'], function ($view): void {
             $viewName = $view->getName();
