@@ -37,7 +37,7 @@ if (menuToggle && navigation) {
 
     navigation.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
-            if (window.matchMedia('(max-width: 1024px)').matches) closeMenu({ returnFocus: false });
+            if (window.matchMedia('(max-width: 1180px)').matches) closeMenu({ returnFocus: false });
         });
     });
 
@@ -54,11 +54,19 @@ if (menuToggle && navigation) {
         };
 
         toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+        // Desktop hover: close after a short delay so the pointer can travel from the
+        // link to the menu (and survive small slips outside it) without the menu vanishing.
+        let closeTimer = null;
+        const isDesktop = () => window.matchMedia('(min-width: 1181px)').matches;
         group.addEventListener('mouseenter', () => {
-            if (window.matchMedia('(min-width: 1025px)').matches) setOpen(true);
+            if (!isDesktop()) return;
+            clearTimeout(closeTimer);
+            setOpen(true);
         });
         group.addEventListener('mouseleave', () => {
-            if (window.matchMedia('(min-width: 1025px)').matches) setOpen(false);
+            if (!isDesktop()) return;
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => setOpen(false), 350);
         });
         toggle.addEventListener('keydown', (event) => {
             if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {

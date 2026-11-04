@@ -80,3 +80,8 @@
 .section-order-row:has(input[type=checkbox]:not(:checked)){background:var(--cms-wash)}
 .section-order-row:has(input[type=checkbox]:not(:checked)) .section-order-label{color:var(--cms-muted)}
 @media(max-width:560px){.section-order-row{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}.section-order-handle{display:none}.section-order-buttons{grid-column:2;grid-row:1/span 2}}
+
+/* Content editor action bar: status text on one line, buttons below it. */
+.content-editor-actions{flex-direction:column;align-items:stretch;gap:12px}
+.content-editor-actions .editor-save-status{max-width:none;line-height:1.5}
+.content-editor-actions .editor-action-buttons{justify-content:flex-end}

@@ -2099,3 +2099,20 @@ body.menu-open .menu-toggle { position: relative; z-index: 52; }
 .project-directory-section a > span { color: var(--accent-on-dark); }
 .project-reference-card p span { flex: none; }
 .footer-hours { color: #b7c6d4; font-size: var(--fs-small); line-height: 1.6; }
+
+/* ---- Desktop header: shorter bar, larger menu text, reachable dropdowns ---- */
+@media (min-width: 1025px) {
+    .header-inner { min-height: 72px; }
+    .brand .brand-logo { width: 64px; height: 64px; }
+    .site-header.is-compact .brand-logo { transform: scale(.85); }
+    .primary-navigation { gap: clamp(16px, 1.7vw, 28px); font-size: 15px; }
+    .primary-navigation .nav-cta { padding-block: 11px; }
+    /* The menu now starts right at the bottom of its link; the invisible ::before
+       bridge fills the space down to the header edge so hovering never "falls off". */
+    .nav-submenu { top: 100%; margin-top: 8px; }
+    .nav-submenu::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 22px; }
+    .nav-submenu a { font-size: 15px; }
+}
+@media (min-width: 1181px) and (max-width: 1240px) {
+    .primary-navigation { gap: 14px; font-size: 14px; }
+}
