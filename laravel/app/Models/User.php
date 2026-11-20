@@ -15,6 +15,12 @@ class User extends Authenticatable
     protected $fillable = ['name', 'email', 'password', 'is_active', 'last_login_at'];
     protected $hidden = ['password', 'remember_token'];
 
+    /** Password reset links are sent straight away (no queue worker on cPanel) with the CMS-branded email. */
+    public function sendPasswordResetNotification($token): void
+    {
+        \Illuminate\Support\Facades\Mail::to($this->email, $this->name)->send(new \App\Mail\CmsPasswordResetMail($this, $token));
+    }
+
     protected function casts(): array
     {
         return [

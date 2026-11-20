@@ -206,7 +206,16 @@
         const preview = item.mime?.startsWith('image/') ? document.createElement('img') : document.createElement('span');
         if (preview.tagName === 'IMG') { preview.src = item.url; preview.alt = ''; } else { preview.className = 'media-picker-file'; preview.textContent = (item.mime || 'File').split('/').pop().toUpperCase(); }
         const name = document.createElement('span'); name.textContent = item.name; button.append(preview, name);
-        button.addEventListener('click', () => { if (!activeField) return; activeField.input.value = item.value; activeField.label.textContent = item.name; activeField.input.dispatchEvent(new Event('change', {bubbles:true})); dialog.close(); });
+        button.addEventListener('click', () => {
+            if (!activeField) return;
+            // Galleries and the rich text editor pass their own handler; galleries keep the picker open.
+            if (activeField.onPick) {
+                const keepOpen = activeField.onPick(item);
+                if (keepOpen) { button.classList.add('is-picked'); button.setAttribute('aria-pressed', 'true'); } else dialog.close();
+                return;
+            }
+            activeField.input.value = item.value; activeField.label.textContent = item.name; activeField.input.dispatchEvent(new Event('change', {bubbles:true})); dialog.close();
+        });
         grid?.append(button);
     });
     const load = async (url = null, append = false) => {
@@ -215,9 +224,21 @@
         const response = await fetch(target, {headers:{Accept:'application/json'}}); const data = await response.json(); renderItems(data.items || []); nextUrl=data.next_page_url; if(more) more.hidden=!nextUrl;
     };
     document.querySelectorAll('[data-media-picker-open]').forEach((button) => button.addEventListener('click', () => {
-        const input=document.getElementById(button.dataset.field); const label=button.parentElement.querySelector('[data-media-selected]'); activeField={input,label}; dialog.showModal(); load(); search?.focus();
+        const input=document.getElementById(button.dataset.field); const label=button.parentElement.querySelector('[data-media-selected]'); activeField={input,label}; if (pickerHint) pickerHint.hidden = true; if (pickerDone) pickerDone.hidden = true; dialog.showModal(); load(); search?.focus();
     }));
-    dialog?.querySelector('[data-media-close]')?.addEventListener('click',()=>dialog.close());
+    const pickerHint = dialog?.querySelector('[data-picker-hint]');
+    const pickerDone = dialog?.querySelector('[data-picker-done]');
+    // Opened by the gallery field and the rich text "Photo" button (public/js/admin-editor.js).
+    window.cmsOpenMediaPicker = (onPick, options = {}) => {
+        if (!dialog) return;
+        activeField = { onPick };
+        if (pickerHint) pickerHint.hidden = !options.multiple;
+        if (pickerDone) pickerDone.hidden = !options.multiple;
+        if (type) type.value = options.type || '';
+        dialog.showModal(); load(); search?.focus();
+    };
+    dialog?.querySelectorAll('[data-media-close]').forEach((button) => button.addEventListener('click',()=>dialog.close()));
+    dialog?.addEventListener('close', () => { if (pickerHint) pickerHint.hidden = true; if (pickerDone) pickerDone.hidden = true; });
     let filterTimer; [search,type].forEach((control)=>control?.addEventListener('input',()=>{clearTimeout(filterTimer);filterTimer=setTimeout(()=>load(),180)}));
     more?.addEventListener('click',()=>nextUrl&&load(nextUrl,true));
     document.querySelectorAll('[data-media-remove]').forEach((button)=>button.addEventListener('click',()=>{const input=document.getElementById(button.dataset.mediaRemove);input.value='';input.dispatchEvent(new Event('change',{bubbles:true}));button.parentElement.querySelector('[data-media-selected]').textContent='No file selected';}));

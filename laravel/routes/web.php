@@ -3,7 +3,10 @@
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Admin\CmsContentController;
+use App\Http\Controllers\Admin\CmsEmailController;
+use App\Http\Controllers\Admin\CmsSeoController;
 use App\Http\Controllers\Admin\CmsPageController;
 use App\Http\Controllers\Admin\CmsPreviewController;
 use App\Http\Controllers\Admin\CmsSystemController;
@@ -17,14 +20,18 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ActivitiesController;
+use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/services', [ServicesController::class, 'index'])->name('services');
+Route::get('/services/{slug}', [ServicesController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('services.show');
 Route::get('/projects', [ProjectsController::class, 'index'])->name('projects');
+Route::get('/projects/{slug}', [ProjectsController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('projects.show');
 Route::get('/team', [TeamController::class, 'index'])->name('team');
 Route::get('/partners', [PartnersController::class, 'index'])->name('partners');
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery');
@@ -37,6 +44,10 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 Route::prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
     Route::post('/login', [AdminAuthController::class, 'store'])->middleware('throttle:5,15')->name('login.store');
+    Route::get('/forgot-password', [AdminPasswordResetController::class, 'request'])->name('password.request');
+    Route::post('/forgot-password', [AdminPasswordResetController::class, 'email'])->middleware('throttle:5,15')->name('password.email');
+    Route::get('/reset-password/{token}', [AdminPasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [AdminPasswordResetController::class, 'update'])->middleware('throttle:10,15')->name('password.update');
 
     Route::middleware(['auth', 'cms.active'])->group(function (): void {
         Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
@@ -50,6 +61,13 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::put('/settings', [CmsSystemController::class, 'saveSettings'])->name('settings.update');
         Route::get('/enquiries', [CmsSystemController::class, 'enquiries'])->name('enquiries.index');
         Route::put('/enquiries/{enquiry}', [CmsSystemController::class, 'updateEnquiry'])->name('enquiries.update');
+        Route::post('/enquiries/{enquiry}/resend', [CmsEmailController::class, 'resend'])->middleware('throttle:20,1')->name('enquiries.resend');
+        Route::get('/email', [CmsEmailController::class, 'index'])->name('email.index');
+        Route::post('/email/test', [CmsEmailController::class, 'test'])->middleware('throttle:10,1')->name('email.test');
+        Route::get('/seo', [CmsSeoController::class, 'index'])->name('seo.index');
+        Route::get('/redirects', [CmsSeoController::class, 'redirects'])->name('redirects.index');
+        Route::post('/redirects', [CmsSeoController::class, 'storeRedirect'])->name('redirects.store');
+        Route::delete('/redirects/{redirect}', [CmsSeoController::class, 'destroyRedirect'])->name('redirects.destroy');
         Route::get('/activity', [CmsSystemController::class, 'activity'])->name('activity.index');
         Route::get('/trash', [CmsSystemController::class, 'trash'])->name('trash.index');
         Route::post('/trash/content/{entry}/restore', [CmsSystemController::class, 'restoreContent'])->name('trash.content.restore');
@@ -64,8 +82,10 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
         Route::put('/users/{user}/password', [AdminUserController::class, 'resetPassword'])->name('users.password');
         Route::patch('/users/{user}/active', [AdminUserController::class, 'setActive'])->name('users.active');
+        Route::post('/users/{user}/reset-link', [AdminUserController::class, 'sendResetLink'])->middleware('throttle:10,1')->name('users.reset-link');
 
         Route::get('/content/{section}', [CmsContentController::class, 'index'])->name('content.index');
+        Route::post('/content/gallery/bulk', [CmsContentController::class, 'bulkGallery'])->name('content.gallery-bulk');
         Route::get('/content/{section}/create', [CmsContentController::class, 'create'])->name('content.create');
         Route::post('/content/{section}', [CmsContentController::class, 'store'])->name('content.store');
         Route::get('/content/{section}/{entry}/preview', [CmsPreviewController::class, 'content'])->name('content.preview');
@@ -74,6 +94,8 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::put('/content/{section}/{entry}/publish', [CmsContentController::class, 'publish'])->name('content.publish');
         Route::post('/content/{section}/{entry}/unpublish', [CmsContentController::class, 'unpublish'])->name('content.unpublish');
         Route::delete('/content/{section}/{entry}', [CmsContentController::class, 'destroy'])->name('content.destroy');
+        Route::post('/content/{section}/{entry}/duplicate', [CmsContentController::class, 'duplicate'])->name('content.duplicate');
+        Route::post('/content/{section}/{entry}/move', [CmsContentController::class, 'move'])->name('content.move');
         Route::post('/content/{section}/{entry}/versions/{version}/restore', [CmsContentController::class, 'restoreVersion'])->name('content.restore-version');
     });
 });

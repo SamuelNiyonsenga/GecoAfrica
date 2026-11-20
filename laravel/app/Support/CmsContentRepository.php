@@ -38,6 +38,26 @@ class CmsContentRepository
         return $items ?: (self::hasCmsRecords('service') ? [] : ServicesCatalog::all());
     }
 
+    public static function findService(string $slug): ?array
+    {
+        foreach (self::services() as $service) {
+            if (($service['slug'] ?? null) === $slug) {
+                return $service;
+            }
+        }
+        return null;
+    }
+
+    public static function findFeaturedProject(string $slug): ?array
+    {
+        foreach (self::featuredProjects() as $project) {
+            if (($project['slug'] ?? null) === $slug) {
+                return $project;
+            }
+        }
+        return null;
+    }
+
     public static function homepageServices(): array
     {
         return array_map(static function (array $service): array {
@@ -127,7 +147,7 @@ class CmsContentRepository
     {
         $items = self::all('blog_post');
         if (!$items) {
-            return self::hasCmsRecords('blog_post') ? [] : InsightsCatalog::all();
+            return self::hasCmsRecords('blog_post') ? [] : array_map(static fn (array $article): array => self::withBlogCategory($article), InsightsCatalog::all());
         }
         return array_map(static fn (array $article): array => self::withBlogCategory($article), $items);
     }
@@ -135,7 +155,9 @@ class CmsContentRepository
     public static function findBlog(string $slug): ?array
     {
         $entry = CmsContentEntry::query()->published()->where('type', 'blog_post')->where('slug', $slug)->with('translations')->first();
-        return $entry ? self::withBlogCategory(self::fields($entry)) : (self::hasCmsRecords('blog_post') ? null : InsightsCatalog::find($slug));
+        if ($entry) return self::withBlogCategory(self::fields($entry));
+        $catalogArticle = self::hasCmsRecords('blog_post') ? null : InsightsCatalog::find($slug);
+        return $catalogArticle ? self::withBlogCategory($catalogArticle) : null;
     }
 
     public static function blogCategories(): array
@@ -164,6 +186,23 @@ class CmsContentRepository
             is_array($article['sections'] ?? null) ? $article['sections'] : [],
             'is_array'
         ));
+        // The rich text body wins; older articles fall back to their heading + paragraph sections.
+        $article['body'] = is_string($article['body'] ?? null) && trim($article['body']) !== ''
+            ? $article['body']
+            : RichText::fromSections($article['sections']);
+        if (trim((string) ($article['readTime'] ?? '')) === '' && $article['body'] !== '') {
+            $article['readTime'] = RichText::readTime($article['body']);
+        }
+        $article['author'] = trim((string) ($article['author'] ?? '')) ?: 'GECO Africa';
+        $published = trim((string) ($article['publishedDate'] ?? ''));
+        if ($published === '' && isset($article['cmsId'])) {
+            $published = (string) (CmsContentEntry::query()->whereKey($article['cmsId'])->value('published_at') ?? '');
+        }
+        try {
+            $article['publishedAt'] = $published !== '' ? \Illuminate\Support\Carbon::parse($published) : null;
+        } catch (\Throwable) {
+            $article['publishedAt'] = null;
+        }
         return $article;
     }
 
@@ -211,6 +250,7 @@ class CmsContentRepository
         }
         $fields['slug'] = $entry->slug;
         $fields['cmsId'] = $entry->id;
+        $fields['updatedAt'] = $entry->updated_at;
         return $fields;
     }
 }

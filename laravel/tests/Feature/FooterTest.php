@@ -21,7 +21,7 @@ class FooterTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Our services')
-            ->assertSee(route('services').'#geotechnical-engineering', false)
+            ->assertSee(route('services.show', 'geotechnical-engineering'), false)
             ->assertDontSee('footer-social', false);
     }
 

@@ -8,7 +8,11 @@ use App\Models\CmsContentEntry;
 use App\Models\CmsContentTranslation;
 use App\Models\CmsContentVersion;
 use App\Models\CmsMediaAsset;
+use App\Models\CmsRedirect;
 use App\Support\CmsContentTypes;
+use App\Support\CmsSlug;
+use App\Support\HtmlSanitizer;
+use App\Support\RichText;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,9 +39,11 @@ class CmsContentController extends Controller
                 $translationQuery->where('locale_code', 'en')->whereRaw('CAST(published_fields AS CHAR) LIKE ?', ['%'.$search.'%']);
             });
         }
-        $entries = $query->orderBy('sort_order')->orderByDesc('updated_at')->paginate(30)->withQueryString();
+        $entries = $query->orderBy('sort_order')->orderBy('id')->paginate(30)->withQueryString();
 
-        return view('admin.content.index', compact('section', 'definition', 'entries', 'status', 'search'));
+        $galleryCategories = $section === 'gallery' ? $this->categoryOptions('gallery_category') : [];
+
+        return view('admin.content.index', compact('section', 'definition', 'entries', 'status', 'search', 'galleryCategories'));
     }
 
     public function create(string $section): View
@@ -48,6 +54,7 @@ class CmsContentController extends Controller
             'definition' => $definition,
             'entry' => null,
             'fields' => [],
+            'nextSortOrder' => $this->nextSortOrder($definition['type']),
             'assets' => $this->mediaOptions(),
             'parents' => $this->parents($definition),
             'categoryOptions' => $this->categoryFieldOptions($definition),
@@ -60,7 +67,10 @@ class CmsContentController extends Controller
         $definition = $this->definition($section);
         if (blank($request->input('slug'))) {
             $title = $request->input('fields.title', $request->input('fields.name', ''));
-            $request->merge(['slug' => \App\Support\CmsSlug::make((string) $title)]);
+            $request->merge(['slug' => CmsSlug::make((string) $title)]);
+        }
+        if (blank($request->input('sort_order'))) {
+            $request->merge(['sort_order' => $this->nextSortOrder($definition['type'])]);
         }
         $meta = $this->validateMeta($request, $definition, null);
         $fields = $this->validateFields($request, $definition);
@@ -90,12 +100,17 @@ class CmsContentController extends Controller
         $definition = $this->definition($section);
         abort_unless($entry->type === $definition['type'], 404);
         $entry->load('translations');
+        $fields = $entry->draftFields('en');
+        // Older articles were written as heading + paragraph boxes: open them in the rich text editor.
+        if (isset($definition['fields']['body'], $definition['fields']['sections']) && trim((string) ($fields['body'] ?? '')) === '' && !empty($fields['sections'])) {
+            $fields['body'] = RichText::fromSections((array) $fields['sections']);
+        }
 
         return view('admin.content.form', [
             'section' => $section,
             'definition' => $definition,
             'entry' => $entry,
-            'fields' => $entry->draftFields('en'),
+            'fields' => $fields,
             'trashedMediaFields' => $this->trashedMediaFields($definition, $entry->draftFields('en')),
             'assets' => $this->mediaOptions(),
             'parents' => $this->parents($definition),
@@ -110,6 +125,7 @@ class CmsContentController extends Controller
         abort_unless($entry->type === $definition['type'], 404);
         $meta = $this->validateMeta($request, $definition, $entry);
         $fields = $this->validateFields($request, $definition, $entry->draftFields('en'));
+        $this->rememberMovedAddress($entry, $meta['slug']);
 
         DB::transaction(function () use ($entry, $meta, $fields): void {
             $entry->update($meta);
@@ -130,6 +146,7 @@ class CmsContentController extends Controller
         abort_unless($entry->type === $definition['type'], 404);
         $meta = $this->validateMeta($request, $definition, $entry);
         $fields = $this->validateFields($request, $definition, $entry->draftFields('en'));
+        $this->rememberMovedAddress($entry, $meta['slug']);
         $entry->fill($meta);
         $this->validatePublish($entry, $fields, $definition);
 
@@ -168,6 +185,98 @@ class CmsContentController extends Controller
         return to_route('admin.content.index', $section)->with('success', 'Content moved to Trash.');
     }
 
+    /** Copy an item as a new draft, so similar items are quick to add. */
+    public function duplicate(Request $request, string $section, CmsContentEntry $entry): RedirectResponse
+    {
+        $definition = $this->definition($section);
+        abort_unless($entry->type === $definition['type'], 404);
+        $fields = $entry->draftFields('en') ?: $entry->translatedFields('en');
+        $titleKey = array_key_exists('title', $definition['fields']) ? 'title' : 'name';
+        $fields[$titleKey] = trim((string) ($fields[$titleKey] ?? '')).' (copy)';
+        $base = CmsSlug::make($fields[$titleKey]) ?: $entry->slug.'-copy';
+        $slug = $base;
+        for ($n = 2; CmsContentEntry::withTrashed()->where('type', $entry->type)->where('slug', $slug)->exists(); $n++) {
+            $slug = $base.'-'.$n;
+        }
+        $copy = new CmsContentEntry([
+            'type' => $entry->type, 'slug' => $slug, 'parent_id' => $entry->parent_id, 'group_key' => $entry->group_key,
+            'status' => 'draft', 'sort_order' => $this->nextSortOrder($entry->type), 'is_featured' => $entry->is_featured,
+        ]);
+        DB::transaction(function () use ($copy, $fields): void {
+            $copy->save();
+            $copy->translations()->create(['locale_code' => 'en', 'draft_fields' => $fields, 'published_fields' => null]);
+        });
+        $this->audit($request, 'content.duplicate', $copy, ['from' => $entry->id]);
+
+        return to_route('admin.content.edit', [$section, $copy])->with('success', 'Copy created as a draft. Change what you need, then publish it.');
+    }
+
+    /** Move an item one place up or down in the website order. */
+    public function move(Request $request, string $section, CmsContentEntry $entry): RedirectResponse
+    {
+        $definition = $this->definition($section);
+        abort_unless($entry->type === $definition['type'], 404);
+        $direction = $request->input('direction') === 'up' ? -1 : 1;
+        $siblings = CmsContentEntry::query()->where('type', $entry->type)
+            ->when($entry->parent_id, fn (Builder $query) => $query->where('parent_id', $entry->parent_id))
+            ->when(!empty($definition['group_options']), fn (Builder $query) => $query->where('group_key', $entry->group_key))
+            ->orderBy('sort_order')->orderBy('id')->pluck('id')->all();
+        $index = array_search($entry->id, $siblings, true);
+        $target = $index === false ? false : $index + $direction;
+        if ($index !== false && isset($siblings[$target])) {
+            [$siblings[$index], $siblings[$target]] = [$siblings[$target], $siblings[$index]];
+            DB::transaction(function () use ($siblings): void {
+                foreach ($siblings as $position => $id) {
+                    CmsContentEntry::query()->whereKey($id)->update(['sort_order' => ($position + 1) * 10]);
+                }
+            });
+            $this->audit($request, 'content.reorder', $entry);
+        }
+
+        return back()->with('success', 'Order updated. The website now shows the new order.');
+    }
+
+    /** Upload many photos at once; each becomes a gallery item. */
+    public function bulkGallery(Request $request): RedirectResponse
+    {
+        $definition = $this->definition('gallery');
+        $data = $request->validate([
+            'files' => ['required', 'array', 'max:30'],
+            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,mp4,webm', 'max:51200'],
+            'category' => ['nullable', 'string', 'max:180'],
+            'publish' => ['nullable', 'boolean'],
+        ]);
+        $category = (string) ($data['category'] ?? '');
+        if ($category !== '' && !array_key_exists($category, $this->categoryOptions('gallery_category'))) {
+            throw ValidationException::withMessages(['category' => 'Choose a category from the list.']);
+        }
+        $publish = $request->boolean('publish');
+        $order = $this->nextSortOrder($definition['type']);
+        $created = 0;
+        foreach ($data['files'] as $file) {
+            $path = $file->store('cms/'.now()->format('Y/m'), 'public');
+            [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+            CmsMediaAsset::query()->create(['disk' => 'public', 'path' => $path, 'original_name' => $file->getClientOriginalName(), 'mime_type' => $file->getMimeType() ?: 'application/octet-stream', 'size_bytes' => $file->getSize(), 'width' => $width, 'height' => $height, 'uploaded_by' => $request->user()?->id]);
+            $title = Str::of(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))->replace(['_', '-'], ' ')->squish()->ucfirst()->limit(150, '')->toString() ?: 'Photo';
+            $slug = CmsSlug::make($title) ?: 'photo';
+            for ($base = $slug, $n = 2; CmsContentEntry::withTrashed()->where('type', $definition['type'])->where('slug', $slug)->exists(); $n++) {
+                $slug = $base.'-'.$n;
+            }
+            $fields = array_replace(CmsContentTypes::defaultsForType($definition['type']), ['title' => $title, 'category' => $category, 'image' => 'storage/'.$path]);
+            $entry = new CmsContentEntry(['type' => $definition['type'], 'slug' => $slug, 'status' => $publish ? 'published' : 'draft', 'published_at' => $publish ? now() : null, 'sort_order' => $order]);
+            DB::transaction(function () use ($entry, $fields, $publish, $request): void {
+                $entry->save();
+                $entry->translations()->create(['locale_code' => 'en', 'draft_fields' => $fields, 'published_fields' => $publish ? $fields : null]);
+                if ($publish) $this->saveVersion($entry, $fields, $request->user()?->id);
+            });
+            $order += 10;
+            $created++;
+        }
+        $this->audit($request, 'content.bulk-gallery', new CmsContentEntry(['type' => $definition['type']]), ['count' => $created]);
+
+        return to_route('admin.content.index', 'gallery')->with('success', $created.' '.Str::plural('photo', $created).' added'.($publish ? ' and published.' : ' as drafts. Add descriptions, then publish them.'));
+    }
+
     public function restoreVersion(Request $request, string $section, CmsContentEntry $entry, CmsContentVersion $version): RedirectResponse
     {
         $definition = $this->definition($section);
@@ -194,7 +303,8 @@ class CmsContentController extends Controller
         if (empty($definition['parent_type'])) {
             return collect();
         }
-        return CmsContentEntry::query()->where('type', $definition['parent_type'])->published()->with('translations')->orderBy('sort_order')->get();
+        // Drafts are listed too (marked as drafts) so a new group can be used straight away.
+        return CmsContentEntry::query()->where('type', $definition['parent_type'])->with('translations')->orderBy('sort_order')->get();
     }
 
     private function mediaOptions(): array
@@ -252,6 +362,10 @@ class CmsContentController extends Controller
         }
         $fields = $existing;
         foreach ($definition['fields'] as $key => $spec) {
+            // Older-format fields are no longer shown in the editor: keep what is stored.
+            if (!empty($spec['legacy']) && !array_key_exists($key, $submitted)) {
+                continue;
+            }
             $raw = $submitted[$key] ?? null;
             if ($spec['type'] === 'list') {
                 $value = is_array($raw) ? $raw : preg_split('/\r?\n/', (string) $raw);
@@ -267,8 +381,27 @@ class CmsContentController extends Controller
                         throw ValidationException::withMessages(['fields.'.$key => 'This structured field must be a JSON object or list.']);
                     }
                 }
+            } elseif ($spec['type'] === 'richtext') {
+                $value = HtmlSanitizer::clean(is_scalar($raw) ? (string) $raw : '');
+            } elseif ($spec['type'] === 'gallery') {
+                $value = array_values(array_unique(array_filter(array_map(static fn ($item) => trim((string) $item), is_array($raw) ? $raw : []), static fn ($item) => $item !== '')));
+                foreach ($value as $path) {
+                    if (!CmsMediaAsset::query()->where('path', str_starts_with($path, 'storage/') ? substr($path, 8) : $path)->exists()) {
+                        throw ValidationException::withMessages(['fields.'.$key => 'Choose photos from the media library.']);
+                    }
+                }
+            } elseif ($spec['type'] === 'toggle') {
+                $value = filter_var($raw, FILTER_VALIDATE_BOOLEAN) ? '1' : '';
+            } elseif ($spec['type'] === 'date') {
+                $value = is_scalar($raw) ? trim((string) $raw) : '';
+                if ($value !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                    throw ValidationException::withMessages(['fields.'.$key => 'Choose a date from the calendar.']);
+                }
             } else {
                 $value = is_scalar($raw) ? trim((string) $raw) : '';
+            }
+            if (!empty($spec['max']) && is_string($value) && mb_strlen($value) > $spec['max']) {
+                throw ValidationException::withMessages(['fields.'.$key => $spec['label'].' must be '.$spec['max'].' characters or fewer.']);
             }
             if (!empty($spec['required']) && ($value === '' || $value === [])) {
                 throw ValidationException::withMessages(['fields.'.$key => $spec['label'].' is required.']);
@@ -335,6 +468,24 @@ class CmsContentController extends Controller
         }
     }
 
+    private function nextSortOrder(string $type): int
+    {
+        return ((int) CmsContentEntry::withTrashed()->where('type', $type)->max('sort_order')) + 10;
+    }
+
+    /** When a published item with its own page changes address, send the old address to the new one. */
+    private function rememberMovedAddress(CmsContentEntry $entry, string $newSlug): void
+    {
+        if ($entry->status !== 'published' || $entry->slug === $newSlug || !CmsContentTypes::hasOwnPage($entry->type) || (string) $entry->slug === '') {
+            return;
+        }
+        try {
+            CmsRedirect::remember(CmsContentTypes::publicUrl($entry->type, $entry->slug), CmsContentTypes::publicUrl($entry->type, $newSlug));
+        } catch (Throwable $exception) {
+            report($exception);
+        }
+    }
+
     private function saveVersion(CmsContentEntry $entry, array $fields, ?int $userId): void
     {
         CmsContentVersion::query()->create([
@@ -344,7 +495,7 @@ class CmsContentController extends Controller
             'created_by' => $userId,
             'created_at' => now(),
         ]);
-        $oldIds = CmsContentVersion::query()->where('entity_type', 'content')->where('entity_key', (string) $entry->id)->latest('created_at')->skip(30)->pluck('id');
+        $oldIds = CmsContentVersion::query()->where('entity_type', 'content')->where('entity_key', (string) $entry->id)->latest('created_at')->pluck('id')->slice(30)->values(); // keep the newest 30
         if ($oldIds->isNotEmpty()) {
             CmsContentVersion::query()->whereIn('id', $oldIds)->delete();
         }

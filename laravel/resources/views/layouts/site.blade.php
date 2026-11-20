@@ -3,9 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @if (config('app.noindex'))<meta name="robots" content="noindex, nofollow">@endif
+    @php
+        $seoSettings = \App\Support\Seo::settings();
+        $shareImage = \App\Support\Seo::absoluteUrl($ogImage ?? null) ?? \App\Support\Seo::defaultImage();
+    @endphp
     <meta name="theme-color" content="#00376d">
-    @hasSection('robots')<meta name="robots" content="@yield('robots')">@else<meta name="robots" content="index, follow, max-image-preview:large">@endif
+    @if (\App\Support\Seo::siteHidden())<meta name="robots" content="noindex, nofollow">
+    @elseif (!empty($robots))<meta name="robots" content="{{ $robots }}">
+    @else @hasSection('robots')<meta name="robots" content="@yield('robots')">@else<meta name="robots" content="index, follow, max-image-preview:large">@endif
+    @endif
+    @if (!empty($seoSettings['google_site_verification']))<meta name="google-site-verification" content="{{ $seoSettings['google_site_verification'] }}">@endif
+    @if (!empty($seoSettings['bing_site_verification']))<meta name="msvalidate.01" content="{{ $seoSettings['bing_site_verification'] }}">@endif
     <title>{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}</title>
     <meta name="description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
     <link rel="canonical" href="{{ \App\Support\Canonical::current() }}">
@@ -19,20 +27,26 @@
         {{-- Preload this site's own copy, even when the stored value is a gecoafrica.com address. --}}
         <link rel="preload" as="image" href="{{ asset(ltrim(preg_replace('#^https?://(www\.)?gecoafrica\.com/#i', '', $preloadImage), '/')) }}" fetchpriority="high">
     @endif
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    @if (!empty($articlePublishedTime))<meta property="article:published_time" content="{{ $articlePublishedTime }}">@endif
+    @if (!empty($articleModifiedTime))<meta property="article:modified_time" content="{{ $articleModifiedTime }}">@endif
     <meta property="og:locale" content="en_RW">
     <meta property="og:site_name" content="GECO Africa">
     <meta property="og:title" content="{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}">
     <meta property="og:description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
     <meta property="og:url" content="{{ \App\Support\Canonical::current() }}">
-    <meta property="og:image" content="{{ $ogImage ?? 'https://gecoafrica.com/images/home/fieldwork-drilling.webp' }}">
+    <meta property="og:image" content="{{ $shareImage }}">
     <meta property="og:image:alt" content="{{ $ogImageAlt ?? 'GECO Africa engineering and geotechnical work in Rwanda' }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $pageTitle ?? 'GECO Africa | Engineering the foundations of progress' }}">
     <meta name="twitter:description" content="{{ $pageDescription ?? 'Civil engineering, geotechnical and infrastructure consultancy in Rwanda.' }}">
-    <meta name="twitter:image" content="{{ $ogImage ?? 'https://gecoafrica.com/images/home/fieldwork-drilling.webp' }}">
+    <meta name="twitter:image" content="{{ $shareImage }}">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
     @if (!empty($structuredData))<script type="application/ld+json">@json($structuredData)</script>@endif
+    @if (!empty($seoSettings['ga4_measurement_id']) && preg_match('/^G-[A-Z0-9]{4,}$/', $seoSettings['ga4_measurement_id']) && empty($cmsPreview?->active()))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $seoSettings['ga4_measurement_id'] }}"></script>
+        <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config',@json($seoSettings['ga4_measurement_id']));</script>
+    @endif
     @stack('head')
 </head>
 <body id="top">
@@ -143,7 +157,7 @@
             <div class="footer-column footer-services">
                 <span class="footer-label">Our services</span>
                 @foreach ($footerServices as $footerService)
-                    <a href="{{ route('services') }}{{ $footerService['slug'] !== '' ? '#'.$footerService['slug'] : '' }}">{{ $footerService['title'] }}</a>
+                    <a href="{{ $footerService['slug'] !== '' ? route('services.show', $footerService['slug']) : route('services') }}">{{ $footerService['title'] }}</a>
                 @endforeach
             </div>
             @endif

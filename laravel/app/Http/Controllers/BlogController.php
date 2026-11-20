@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Support\CmsContentRepository;
+use App\Support\RichText;
+use App\Support\Seo;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -35,8 +37,8 @@ class BlogController extends Controller
             'item' => [
                 '@type' => 'BlogPosting',
                 'headline' => $article['title'],
-                'url' => 'https://gecoafrica.com/blog/'.$article['slug'].'/',
-                'image' => 'https://gecoafrica.com/'.$article['image'],
+                'url' => route('blog.show', $article['slug']),
+                'image' => Seo::absoluteUrl($article['image']),
                 'author' => ['@id' => 'https://gecoafrica.com/#organization'],
             ],
         ], $articles, array_keys($articles));
@@ -60,21 +62,46 @@ class BlogController extends Controller
 
         abort_if($article === null, 404);
 
-        $related = array_values(array_filter(
+        $others = array_values(array_filter(
             CmsContentRepository::blog(),
             static fn (array $item): bool => $item['slug'] !== $article['slug'],
         ));
-        $nextArticle = $related[0] ?? null;
+        // Same-category articles first, then the rest.
+        usort($others, static fn (array $a, array $b): int => (int) (($b['categorySlug'] ?? '') === $article['categorySlug']) <=> (int) (($a['categorySlug'] ?? '') === $article['categorySlug']));
+        $body = RichText::withHeadingAnchors($article['body'], 'guide-section');
+        $url = route('blog.show', $article['slug']);
+        $seo = Seo::forItem($article);
+        $modified = $article['updatedAt'] ?? null;
 
-        return view('blog-article', [
+        return view('blog-article', $seo + [
+            'cmsPageKey' => 'article',
             'article' => $article,
-            'relatedArticles' => array_slice($related, 0, 2),
-            'nextArticle' => $nextArticle,
-            'pageTitle' => $article['title'].' | GECO Africa Insights',
-            'pageDescription' => $article['summary'],
-            'canonicalUrl' => 'https://gecoafrica.com/blog/'.$article['slug'].'/',
-            'ogImage' => 'https://gecoafrica.com/'.$article['image'],
-            'ogImageAlt' => $article['imageAlt'],
+            'body' => $body['html'],
+            'toc' => $body['toc'],
+            'relatedArticles' => array_slice($others, 0, 2),
+            'nextArticle' => $others[0] ?? null,
+            'ogType' => 'article',
+            'articlePublishedTime' => $article['publishedAt']?->toAtomString(),
+            'articleModifiedTime' => $modified?->toAtomString(),
+            'schemaExtra' => [
+                array_filter([
+                    '@type' => 'BlogPosting',
+                    'headline' => $article['title'],
+                    'description' => $seo['pageDescription'],
+                    'image' => $seo['ogImage'],
+                    'url' => $url,
+                    'mainEntityOfPage' => $url,
+                    'datePublished' => $article['publishedAt']?->toAtomString(),
+                    'dateModified' => ($modified ?? $article['publishedAt'])?->toAtomString(),
+                    'author' => $article['author'] === 'GECO Africa'
+                        ? ['@id' => rtrim((string) config('app.url'), '/').'/#organization']
+                        : ['@type' => 'Person', 'name' => $article['author']],
+                    'publisher' => ['@id' => rtrim((string) config('app.url'), '/').'/#organization'],
+                    'articleSection' => $article['category'] ?: null,
+                    'wordCount' => str_word_count(RichText::plainText($article['body'])),
+                ]),
+                Seo::breadcrumbs([['Home', route('home')], ['Insights', route('blog')], [$article['title'], $url]]),
+            ],
         ]);
     }
 }

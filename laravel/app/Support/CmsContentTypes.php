@@ -18,7 +18,9 @@ class CmsContentTypes
                 'tags' => ['label' => 'Tags (one per line)', 'type' => 'list'],
                 'items' => ['label' => 'What this service includes (one per line)', 'type' => 'list'],
                 'priceList' => ['label' => 'Downloadable document', 'type' => 'media'],
-            ]],
+                'body' => ['label' => 'Full description', 'type' => 'richtext', 'hint' => 'Shown on this service\'s own page. Use headings, lists and images to explain the service in depth.'],
+                'gallery' => ['label' => 'More photos', 'type' => 'gallery', 'hint' => 'Extra photos shown on this service\'s own page.'],
+            ] + self::seoFields()],
             'project-groups' => ['type' => 'project_group', 'label' => 'Project groups', 'singular' => 'project group', 'fields' => [
                 'number' => ['label' => 'Display number', 'type' => 'text'],
                 'title' => ['label' => 'Group title', 'type' => 'text', 'required' => true],
@@ -38,7 +40,11 @@ class CmsContentTypes
                 'image' => ['label' => 'Photo', 'type' => 'media'],
                 'imageAlt' => ['label' => 'Photo description', 'type' => 'text'],
                 'areaNote' => ['label' => 'Additional note', 'type' => 'textarea'],
-            ]],
+                'client' => ['label' => 'Client', 'type' => 'text'],
+                'year' => ['label' => 'Year or period', 'type' => 'text', 'hint' => 'When the work happened, e.g. 2021 or 2019–2021.'],
+                'body' => ['label' => 'Project story', 'type' => 'richtext', 'hint' => 'Shown on this project\'s own page: the brief, the work GECO did and the result.'],
+                'gallery' => ['label' => 'Project photos', 'type' => 'gallery', 'hint' => 'Photos shown on this project\'s own page.'],
+            ] + self::seoFields()],
             'team' => ['type' => 'team_member', 'label' => 'Team', 'singular' => 'team member', 'group_options' => ['core' => 'Core team', 'supporting' => 'Supporting team'], 'fields' => [
                 'name' => ['label' => 'Full name', 'type' => 'text', 'required' => true],
                 'shortName' => ['label' => 'Display name', 'type' => 'text'],
@@ -78,10 +84,13 @@ class CmsContentTypes
                 'summary' => ['label' => 'Summary', 'type' => 'textarea'],
                 'image' => ['label' => 'Cover image', 'type' => 'media'],
                 'imageAlt' => ['label' => 'Cover image description', 'type' => 'text'],
+                'body' => ['label' => 'Article', 'type' => 'richtext', 'hint' => 'Write the article here. Each "Heading" becomes an entry in the "In this guide" box.'],
+                'publishedDate' => ['label' => 'Publication date', 'type' => 'date', 'hint' => 'Shown on the article and given to Google. Leave empty to use the day it is first published.'],
+                'author' => ['label' => 'Author', 'type' => 'text', 'hint' => 'Leave empty to show "GECO Africa".'],
                 'readTime' => ['label' => 'Reading time', 'type' => 'text'],
                 'serviceAnchor' => ['label' => 'Related service', 'type' => 'category', 'source' => 'service', 'hint' => 'The service linked in the "Related service" box beside the article.'],
-                'sections' => ['label' => 'Article sections', 'type' => 'json', 'template' => [['heading' => '', 'paragraphs' => ['']]]],
-            ]],
+                'sections' => ['label' => 'Article sections (older format)', 'type' => 'json', 'legacy' => true, 'template' => [['heading' => '', 'paragraphs' => ['']]]],
+            ] + self::seoFields()],
             'gallery-categories' => ['type' => 'gallery_category', 'label' => 'Gallery categories', 'singular' => 'gallery category', 'fields' => [
                 'name' => ['label' => 'Category name', 'type' => 'text', 'required' => true],
             ]],
@@ -124,7 +133,7 @@ class CmsContentTypes
             'duration' => 'How long it ran, e.g. June to July 2021.',
             'websiteLabel' => 'Short web address shown as the link text, e.g. afridrillers.com.',
             'eyebrow' => 'Small label in capitals shown above the article title.',
-            'readTime' => 'Shown next to the category, e.g. 5 min read.',
+            'readTime' => 'Shown next to the category. Leave empty to work it out from the article length.',
             'qualification' => 'Degree or professional title shown in the team profile.',
             'cv' => 'PDF visitors can open from the "View CV" button.',
             'priceList' => 'File visitors can download from this service, e.g. a price list PDF.',
@@ -141,6 +150,34 @@ class CmsContentTypes
         }
         unset($type);
         return $types;
+    }
+
+    /** Search & sharing fields for content that has its own page on the website. */
+    public static function seoFields(): array
+    {
+        return [
+            'seoTitle' => ['label' => 'Google title', 'type' => 'text', 'panel' => 'seo', 'max' => 70, 'hint' => 'Leave empty to use the title. Aim for 50–60 characters.'],
+            'seoDescription' => ['label' => 'Google description', 'type' => 'textarea', 'panel' => 'seo', 'max' => 170, 'hint' => 'Leave empty to use the summary. Aim for 120–160 characters.'],
+            'seoImage' => ['label' => 'Sharing image', 'type' => 'media', 'panel' => 'seo', 'hint' => 'Picture shown when this page is shared on WhatsApp, LinkedIn or Facebook. Leave empty to use the main photo.'],
+            'noindex' => ['label' => 'Hide this page from Google', 'type' => 'toggle', 'panel' => 'seo', 'hint' => 'Visitors can still open it, but search engines are asked not to list it.'],
+        ];
+    }
+
+    /** Types whose items each have their own page on the website. */
+    public static function hasOwnPage(string $type): bool
+    {
+        return in_array($type, ['blog_post', 'service', 'project_feature'], true);
+    }
+
+    /** The section key (e.g. "blog") for a stored type (e.g. "blog_post"). */
+    public static function sectionFor(string $type): ?string
+    {
+        foreach (self::all() as $section => $definition) {
+            if ($definition['type'] === $type) {
+                return $section;
+            }
+        }
+        return null;
     }
 
     public static function get(string $section): ?array
@@ -166,7 +203,7 @@ class CmsContentTypes
     {
         $defaults = [];
         foreach (self::forType($type)['fields'] ?? [] as $key => $spec) {
-            $defaults[$key] = in_array($spec['type'], ['list', 'json'], true) ? [] : '';
+            $defaults[$key] = in_array($spec['type'], ['list', 'json', 'gallery'], true) ? [] : '';
         }
         return $defaults;
     }
@@ -177,11 +214,12 @@ class CmsContentTypes
         return match ($type) {
             'blog_post' => $slug ? route('blog.show', $slug) : route('blog'),
             'blog_category' => route('blog'),
-            'service' => route('services').($slug ? '#'.$slug : ''),
+            'service' => $slug ? route('services.show', $slug) : route('services'),
             'team_member' => route('team').($slug ? '#'.$slug : ''),
             'partner' => route('partners'),
             'gallery_item', 'gallery_category' => route('gallery'),
-            'project_group', 'project_reference', 'project_feature' => route('projects'),
+            'project_feature' => $slug ? route('projects.show', $slug) : route('projects'),
+            'project_group', 'project_reference' => route('projects').'#project-references',
             'activity' => route('activities'),
             default => null,
         };

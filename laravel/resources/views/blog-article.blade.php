@@ -5,14 +5,14 @@
     <section class="insight-article-hero">
         <div class="site-container">
             <nav class="breadcrumbs" aria-label="Breadcrumb">
-                <a href="{{ route('home') }}">Home</a><span aria-hidden="true">/</span><a href="{{ route('blog') }}">Insights</a><span aria-hidden="true">/</span><span aria-current="page">{{ $article['category'] }}</span>
+                <a href="{{ route('home') }}">Home</a><span aria-hidden="true">/</span><a href="{{ route('blog') }}">Insights</a><span aria-hidden="true">/</span><span aria-current="page">{{ $article['title'] }}</span>
             </nav>
             <div class="insight-article-heading">
                 <a class="insight-back-link" href="{{ route('blog') }}"><span aria-hidden="true">←</span> All insights</a>
                 <p class="eyebrow"><span class="eyebrow-line"></span> {{ $article['eyebrow'] }}</p>
                 <h1>{{ $article['title'] }}</h1>
                 <p class="insight-article-summary">{{ $article['summary'] }}</p>
-                <div class="insight-article-byline"><span>{{ $article['category'] }}</span><i aria-hidden="true"></i><span>{{ $article['readTime'] }}</span><span class="insight-byline-company">GECO Africa · Engineering guide</span></div>
+                <div class="insight-article-byline">@if($article['category'])<span>{{ $article['category'] }}</span><i aria-hidden="true"></i>@endif<span>{{ $article['readTime'] }}</span>@if($article['publishedAt'])<i aria-hidden="true"></i><time datetime="{{ $article['publishedAt']->toDateString() }}">{{ $article['publishedAt']->format('j F Y') }}</time>@endif<span class="insight-byline-company">{{ $article['author'] === 'GECO Africa' ? 'GECO Africa · Engineering guide' : 'By '.$article['author'] }}</span></div>
             </div>
             <figure class="insight-article-cover">
                 <img src="{{ asset($article['image']) }}" width="1600" height="900" alt="{{ $article['imageAlt'] }}" fetchpriority="high" decoding="async">
@@ -25,31 +25,24 @@
         <div class="site-container insight-reading-grid">
             <aside class="insight-reading-aside">
                 <span class="insight-aside-label">In this guide</span>
+                @if ($toc)
                 <nav aria-label="Article contents">
-                    @foreach ($article['sections'] as $section)
-                        <a href="#guide-section-{{ $loop->iteration }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $section['heading'] ?? '' }}</a>
+                    @foreach ($toc as $heading)
+                        <a href="#{{ $heading['id'] }}"><span>{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>{{ $heading['heading'] }}</a>
                     @endforeach
                 </nav>
+                @endif
                 @if ($article['serviceAnchor'] !== '' && $article['serviceLabel'] !== '')
                 <div class="insight-aside-related">
                     <span class="insight-aside-label">Related service</span>
-                    <a href="{{ route('services') }}#{{ $article['serviceAnchor'] }}">{{ $article['serviceLabel'] }} <span aria-hidden="true">↗</span></a>
+                    <a href="{{ route('services.show', $article['serviceAnchor']) }}">{{ $article['serviceLabel'] }} <span aria-hidden="true">↗</span></a>
                 </div>
                 @endif
             </aside>
 
             <article class="insight-article-body">
-                @foreach ($article['sections'] as $section)
-                    <section id="guide-section-{{ $loop->iteration }}" class="insight-content-section">
-                        <span class="insight-section-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
-                        <div>
-                            <h2>{{ $section['heading'] ?? '' }}</h2>
-                            @foreach ((array) ($section['paragraphs'] ?? []) as $paragraph)
-                                <p>{{ $paragraph }}</p>
-                            @endforeach
-                        </div>
-                    </section>
-                @endforeach
+                {{-- Rich text from the CMS, cleaned by App\Support\HtmlSanitizer when it was saved. --}}
+                <div class="rich-text">{!! $body !!}</div>
 
                 <div class="insight-article-note"><span aria-hidden="true">GECO</span><p>This guide shares general engineering context. Project requirements and design decisions should be assessed by the responsible professionals for each site and brief.</p></div>
 

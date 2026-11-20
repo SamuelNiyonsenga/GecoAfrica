@@ -32,6 +32,12 @@ class MediaUsage
     {
         foreach ($value as $item) {
             if (is_string($item) && in_array(ltrim($item, '/'), $paths, true)) return true;
+            // Images placed inside rich text (articles, project stories).
+            if (is_string($item) && str_contains($item, '<img')) {
+                foreach ($paths as $path) {
+                    if (str_contains($item, '/'.$path.'"')) return true;
+                }
+            }
             if (is_array($item) && self::containsAny($item, $paths)) return true;
         }
 

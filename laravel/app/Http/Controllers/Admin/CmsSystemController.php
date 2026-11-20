@@ -94,7 +94,21 @@ class CmsSystemController
             'business_name' => ['required', 'string', 'max:120'],
             'tagline' => ['nullable', 'string', 'max:180'],
             'public_email' => ['required', 'email', 'max:255'],
-            'notification_email' => ['nullable', 'email', 'max:255'],
+            'notification_email' => ['nullable', 'string', 'max:500', function (string $attribute, mixed $value, \Closure $fail): void {
+                foreach (preg_split('/[,;\s]+/', (string) $value, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $email) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        $fail('"'.$email.'" is not a valid email address. Separate several addresses with commas.');
+                    }
+                }
+            }],
+            'auto_reply_enabled' => ['nullable', 'boolean'],
+            'auto_reply_message' => ['nullable', 'string', 'max:1500'],
+            'seo_title_suffix' => ['nullable', 'string', 'max:60'],
+            'seo_default_image' => ['nullable', 'string', 'max:1024'],
+            'google_site_verification' => ['nullable', 'string', 'max:200'],
+            'bing_site_verification' => ['nullable', 'string', 'max:200'],
+            'ga4_measurement_id' => ['nullable', 'string', 'max:30', 'regex:/^G-[A-Z0-9]{4,}$/i'],
+            'discourage_indexing' => ['nullable', 'boolean'],
             'phone_numbers_text' => ['required', 'string', 'max:1000'],
             'whatsapp_number' => ['nullable', 'string', 'max:40'],
             'address' => ['required', 'string', 'max:500'],
@@ -114,7 +128,16 @@ class CmsSystemController
             'business_name' => trim($data['business_name']),
             'tagline' => trim($data['tagline'] ?? ''),
             'public_email' => mb_strtolower(trim($data['public_email'])),
-            'notification_email' => mb_strtolower(trim($data['notification_email'] ?? $data['public_email'])),
+            'notification_email' => implode(', ', preg_split('/[,;\s]+/', mb_strtolower(trim(($data['notification_email'] ?? '') ?: $data['public_email'])), -1, PREG_SPLIT_NO_EMPTY) ?: []),
+            'auto_reply_enabled' => $request->boolean('auto_reply_enabled'),
+            'auto_reply_message' => trim($data['auto_reply_message'] ?? ''),
+            'seo_title_suffix' => trim($data['seo_title_suffix'] ?? ''),
+            'seo_default_image' => trim($data['seo_default_image'] ?? ''),
+            // Search Console gives a whole <meta> tag; keep only the code inside content="…".
+            'google_site_verification' => self::verificationCode($data['google_site_verification'] ?? ''),
+            'bing_site_verification' => self::verificationCode($data['bing_site_verification'] ?? ''),
+            'ga4_measurement_id' => strtoupper(trim($data['ga4_measurement_id'] ?? '')),
+            'discourage_indexing' => $request->boolean('discourage_indexing'),
             'phone_numbers' => array_values(array_filter(array_map('trim', preg_split('/\r?\n/', $data['phone_numbers_text'])))),
             'whatsapp_number' => trim($data['whatsapp_number'] ?? ''),
             'address' => trim($data['address']),
@@ -130,10 +153,20 @@ class CmsSystemController
         $this->audit($request, 'settings.update', 'settings', '1');
         return back()->with('success', 'Site settings saved.');
     }
+    private static function verificationCode(string $value): string
+    {
+        $value = trim($value);
+        if (preg_match('/content=["\']([^"\']+)["\']/i', $value, $match)) {
+            $value = $match[1];
+        }
+        return preg_replace('/[^A-Za-z0-9_\-]/', '', $value) ?? '';
+    }
+
     public function enquiries(Request $request): View
     {
         $status = $request->string('status')->toString();
-        $query = ContactMessage::query()->orderByRaw("FIELD(status, 'new', 'contacted', 'closed')")->latest();
+        // CASE instead of MySQL-only FIELD() so this also runs on SQLite (tests, local).
+        $query = ContactMessage::query()->orderByRaw("CASE status WHEN 'new' THEN 0 WHEN 'contacted' THEN 1 ELSE 2 END")->latest();
         if (in_array($status, ['new', 'contacted', 'closed'], true)) $query->where('status', $status);
         return view('admin.system.enquiries', ['enquiries' => $query->paginate(25)->withQueryString(), 'status' => $status]);
     }

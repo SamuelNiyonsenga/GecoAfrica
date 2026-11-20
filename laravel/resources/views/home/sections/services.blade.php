@@ -19,7 +19,7 @@
                                 <span>{{ $tag }}</span>
                             @endforeach
                         </div>
-                        <a class="service-card-action" href="{{ route('services') }}#{{ $service['slug'] }}">Explore service <span aria-hidden="true">→</span></a>
+                        <a class="service-card-action" href="{{ route('services.show', $service['slug']) }}">Explore service <span aria-hidden="true">→</span></a>
                     </article>
                 @endforeach
             </div>
