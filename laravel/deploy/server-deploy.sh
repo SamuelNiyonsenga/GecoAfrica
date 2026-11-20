@@ -94,11 +94,12 @@ tar -czf "$BACKUPS/code-$STAMP.tar.gz" -C "$(dirname "$SITE")" \
   --exclude="$(basename "$SITE")/vendor" --exclude="$(basename "$SITE")/storage" "$(basename "$SITE")"
 
 say "Backing up the database to $BACKUPS/db-$STAMP.sql.gz"
-env_value() { grep -E "^$1=" "$SITE/.env" | tail -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"; }
+# tr strips Windows line endings (\r): this .env was edited on a PC, and MySQL would see "localhost\r".
+env_value() { grep -E "^$1=" "$SITE/.env" | tail -1 | cut -d= -f2- | tr -d '\r' | sed -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"; }
 DB_NAME="$(env_value DB_DATABASE)"; DB_USER="$(env_value DB_USERNAME)"; DB_HOST="$(env_value DB_HOST)"
 MYSQL_PWD="$(env_value DB_PASSWORD)" mysqldump --single-transaction --no-tablespaces \
   -h "${DB_HOST:-localhost}" -u "$DB_USER" "$DB_NAME" | gzip > "$BACKUPS/db-$STAMP.sql.gz" \
-  || fail "Database backup failed, so nothing was deployed."
+  || { rm -f "$BACKUPS/db-$STAMP.sql.gz" "$BACKUPS/code-$STAMP.tar.gz"; fail "Database backup failed, so nothing was deployed."; }
 chmod 600 "$BACKUPS"/*
 ls -1t "$BACKUPS"/code-*.tar.gz 2>/dev/null | tail -n +$((KEEP_BACKUPS + 1)) | xargs -r rm -f
 ls -1t "$BACKUPS"/db-*.sql.gz 2>/dev/null | tail -n +$((KEEP_BACKUPS + 1)) | xargs -r rm -f
