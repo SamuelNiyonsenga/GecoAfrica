@@ -232,10 +232,45 @@ changing the passwords (step 0) is what actually closes the leak.
 
 ## 11. Updating the site later
 
+### On the GECO cPanel server (gecoafrica.com), with Terminal
+
+The live app is in `~/new.gecoafrica.com`. That folder name is historical: it serves **gecoafrica.com**.
+Plain `php` in this server's Terminal is PHP 7.2, so always use `/opt/alt/php82/usr/bin/php` for
+`artisan`. The deploy script does this for you.
+
+**One time only:** download the repo next to the site. This changes nothing on the site.
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/SamuelNiyonsenga/GecoAfrica.git ~/geco-repo
+git -C ~/geco-repo sparse-checkout set laravel
+```
+
+**Every deploy**, after merging into `main`:
+
+```bash
+bash ~/geco-repo/laravel/deploy/server-deploy.sh            # preview: lists what would change
+bash ~/geco-repo/laravel/deploy/server-deploy.sh --apply    # deploy
+```
+
+`--apply` does the following, in order:
+1. Backs up the code and the database to `~/geco-backups` (newest 5 kept).
+2. Puts up a maintenance page.
+3. Copies the new code. It never touches `.env`, `.htaccess`, `storage/` (uploads), `vendor/` or `public/v.php`.
+4. Runs `composer install` (with PHP 8.2), but only if `composer.lock` changed.
+5. Runs the migrations and rebuilds the caches.
+6. Brings the site back up.
+
+If a step fails, the site is brought back up and the script stops.
+
+To roll back the code: `tar -xzf ~/geco-backups/code-<date>.tar.gz -C ~`.
+To roll back the database: `gunzip -c ~/geco-backups/db-<date>.sql.gz | mysql -u <user> -p <database>`.
+
+### Anywhere else, by hand
+
 ```bash
 git pull                                 # or upload the changed files
 composer install --no-dev --optimize-autoloader
-php artisan migrate --force              # e.g. 2026_11_20: redirects + enquiry email tracking
+php artisan migrate --force
 php artisan cms:sync-page-fields         # adds any new editable page fields, never overwrites edits
 php artisan config:cache && php artisan route:cache && php artisan view:cache
 ```
