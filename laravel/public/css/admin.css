@@ -84,4 +84,46 @@
 /* Content editor action bar: status text on one line, buttons below it. */
 .content-editor-actions{flex-direction:column;align-items:stretch;gap:12px}
 .content-editor-actions .editor-save-status{max-width:none;line-height:1.5}
-.content-editor-actions .editor-action-buttons{justify-content:flex-end}
+.content-editor-actions .editor-action-buttons{justify-content:flex-end}/* Rich text, photo gallery, Google preview, ordering and bulk upload (Nov 2026) */
+.content-editor-aside{position:static}.content-editor-aside>.panel{margin-bottom:0}
+.content-actions form{margin:0}
+.richtext{border:1px solid #c7d3df;border-radius:8px;background:#fff;overflow:hidden}
+.richtext:focus-within{outline:3px solid #bdd6ef;border-color:var(--cms-blue)}
+.richtext-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:7px;border-bottom:1px solid var(--cms-line);background:var(--cms-wash);position:sticky;top:0;z-index:2}
+.richtext-toolbar button{border:1px solid transparent;background:transparent;border-radius:6px;padding:5px 9px;font:600 13px/1.2 inherit;color:var(--cms-ink);cursor:pointer}
+.richtext-toolbar button:hover,.richtext-toolbar button:focus-visible{background:#fff;border-color:var(--cms-line)}
+.richtext-sep{width:1px;background:var(--cms-line);margin:2px 4px}
+.richtext-area{min-height:320px;max-height:70vh;overflow:auto;padding:16px 20px;font-size:16px;line-height:1.7;outline:none}
+.richtext-area.is-empty:before{content:attr(data-placeholder);color:var(--cms-muted)}
+.richtext-area h2{font-size:24px;line-height:1.25;margin:22px 0 8px;color:var(--cms-blue-deep)}
+.richtext-area h3{font-size:19px;margin:18px 0 6px;color:var(--cms-blue-deep)}
+.richtext-area p{margin:0 0 12px}.richtext-area blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--cms-red);background:var(--cms-wash)}
+.richtext-area img{max-width:100%;height:auto;border-radius:6px}.richtext-area figure{margin:16px 0}.richtext-area figcaption{font-size:13px;color:var(--cms-muted)}
+.richtext-area a{color:var(--cms-blue);text-decoration:underline}
+.gallery-field{display:grid;gap:10px}
+.gallery-field-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gallery-field-list:empty{display:none}
+.gallery-field-item{border:1px solid var(--cms-line);border-radius:8px;padding:6px;background:#fff;display:grid;gap:6px}
+.gallery-field-item img,.gallery-field-item .media-picker-file{width:100%;height:100px;object-fit:cover;border-radius:5px;display:grid;place-items:center}
+.gallery-field-actions{display:flex;gap:4px;flex-wrap:wrap}.gallery-field-actions .button{min-height:28px;padding:3px 7px}
+.gallery-field>.button{justify-self:start}
+.media-picker-item.is-picked{outline:3px solid var(--cms-blue);outline-offset:-3px}
+.media-picker-item.is-picked:after{content:"Added ✓";font-size:12px;font-weight:800;color:var(--cms-blue)}
+.media-picker-hint{margin:0 0 10px;color:var(--cms-muted)}
+.char-count{font-size:12px;color:var(--cms-muted);justify-self:end}.char-count.is-over{color:#a20d15;font-weight:700}
+.seo-panel{display:grid;gap:14px}.seo-panel h2{margin:0}.seo-panel>.muted{margin:-8px 0 0;font-size:14px}
+.google-preview{display:grid;gap:3px;padding:12px 14px;border:1px solid var(--cms-line);border-radius:8px;background:#fff;font-family:Arial,sans-serif}
+.google-preview-url{font-size:12px;color:#4d5156;overflow-wrap:anywhere}
+.google-preview-title{font-size:18px;line-height:1.3;color:#1a0dab}
+.google-preview-description{font-size:13px;line-height:1.5;color:#4d5156}
+.order-cell{white-space:nowrap;width:1%}.order-cell form{display:inline}.order-cell .button{min-height:30px;padding:3px 9px}
+.order-cell .button:disabled{opacity:.35;cursor:default}
+.bulk-upload-form{display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(180px,1fr) auto auto;gap:14px;align-items:end}
+.bulk-upload-form [data-bulk-status]{grid-column:1/-1;margin:0}
+.health-table td{vertical-align:top}.health-issues{margin:0;padding-left:18px;color:#8f1219;font-size:13px}.health-ok{color:#246341;font-weight:700}
+.mail-status{display:inline-block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}.mail-status-ok{color:#246341}.mail-status-failed{color:#a20d15}.mail-status-pending{color:#875b08}
+.mail-error{font-size:12px;color:#8f1219;overflow-wrap:anywhere;margin:4px 0 0}
+.config-list{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;margin:0}.config-list dt{font-weight:700}.config-list dd{margin:0;overflow-wrap:anywhere}
+@media(max-width:900px){.bulk-upload-form{grid-template-columns:1fr}}
+.login-alt-link{margin:18px 0 0;text-align:center;font-size:14px}
+.mail-row{margin-bottom:10px}.mail-row form{margin-top:4px}

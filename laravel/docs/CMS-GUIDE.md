@@ -45,6 +45,16 @@ Every message sent through the website is saved here, even if the notification e
 2. Read the details. Phone numbers and emails are clickable.
 3. Set its status: **New → Contacted → Closed**, and add a private note if useful.
 
+The **Emails** column shows whether the team notification and the automatic reply to the
+visitor were **Sent**. If one says **Failed**, the reason is shown underneath. Fix the cause
+(see **Email delivery**), then select **Try again**.
+
+### Email delivery
+
+**Email delivery** (in the menu under *Search & email*) shows where enquiries are sent and lets
+you **Send a test email**. If the test fails, the page shows the mail server's exact answer:
+send that to your developer.
+
 The red number next to **Enquiries** in the menu shows how many are still new.
 
 ---
@@ -74,10 +84,10 @@ Under **Content** in the menu:
 
 | Section | What it controls |
 |---|---|
-| **Services** | The four service areas on the homepage and Services page |
+| **Services** | The service areas on the homepage and Services page. Each one also has its own page (e.g. /services/geotechnical-engineering) |
+| **Featured projects** | The photo cards on the homepage and Projects page. Each one has its own page with the project story and photos |
+| **Project references** | Each project in the full directory — choose its group (draft groups can be chosen too) |
 | **Project groups** | The disciplines on the Projects page (e.g. Geotechnical investigations) |
-| **Project references** | Each project in the full directory — choose its group |
-| **Featured projects** | The photo cards on the homepage and Projects page |
 | **Team** | People on the Team and About pages — choose *Core team* or *Supporting team* |
 | **Partners** | Partner organisations and their logos |
 | **Gallery** | Photos in the gallery — choose a category from the list |
@@ -94,10 +104,60 @@ Under **Content** in the menu:
    simply not shown.
 4. **Save draft** to finish later, or **Save & publish** to put it live.
 
+**Quicker ways:**
+- **Duplicate** (in the list, or *Duplicate as a new draft* inside an item) copies an existing
+  item as a draft, which is handy for a project or activity similar to one you already have.
+- **Gallery → Add many photos at once**: choose up to 30 photos, pick a category, and each photo
+  becomes its own gallery item, named after its file.
+- **Overview** has buttons to add each kind of content in one click.
+
+### Writing articles, service pages and project stories
+
+The **Article**, **Full description** and **Project story** boxes work like a simple word
+processor:
+- **Heading** starts a new section. On the website each heading is listed in the
+  "In this guide" / "On this page" box. **Subheading** is for smaller sections.
+- **B**, **I**, **• List**, **1. List** and **Quote** format the selected text.
+- **Link**: select the words first, then paste the address.
+- **Photo** inserts a picture from the Media library. You will be asked for a short description
+  (for people who cannot see it, and for Google) and an optional caption.
+- Text pasted from Word or a website arrives as plain paragraphs, so nothing strange appears on
+  the website. Re-apply headings and bold afterwards.
+
+Older articles written as separate "sections" open in the same editor automatically. Saving
+them converts them.
+
+**More photos / Project photos** adds a row of photos to the item's page. Choose **Add photos**,
+select as many as you like, then **Done**. Use ← → to reorder them.
+
+If **Reading time** is empty it is worked out from the length of the article. **Publication
+date** is shown on the article and given to Google.
+
+### Search & sharing (SEO)
+
+Articles, services and featured projects have a **Search & sharing** box on the right. It
+shows a preview of how the page will look in Google. Everything in it is optional:
+- **Google title**: 50–60 characters, saying what the page is about and where (e.g. "Soil
+  testing in Rwanda: what to expect"). Left empty, the title is used.
+- **Google description**: 120–160 characters that make someone want to click. Left empty, the
+  summary is used.
+- **Sharing image**: the picture shown on WhatsApp, LinkedIn and Facebook. Left empty, the main
+  photo is used.
+- **Hide this page from Google**: for pages you don't want in search results.
+
+**SEO health** (in the menu) lists every page with what to improve, in plain language. Pages
+with the most to fix are listed first.
+
+### Changing a web address
+
+If you change the **web address** of a published article, service or project, visitors and
+Google using the old link are sent to the new one automatically. You can see these, and add
+your own (for example for an old page that no longer exists), under **Redirects**.
+
 ### Display order
 
-Lower numbers appear first. Give each item its own number (10, 20, 30…) so you can slot new
-items in between later.
+Use the **↑ ↓** buttons in the list to move an item up or down. New items are added at the end.
+You can also type a number in **Display order**: lower numbers appear first.
 
 ### Hiding or removing
 
@@ -133,8 +193,19 @@ Before moving a file to Trash, the library tells you how many items use it.
 phone numbers, public email, address, opening hours and social media links. They appear in
 the header, footer and Contact page.
 
-**Notification email** is where Contact-page messages are emailed. Change it here — no
-developer needed.
+**Enquiry emails**
+- **Send new enquiries to**: one or more addresses, separated by commas.
+- **Automatic reply**: tick it to email visitors a confirmation, and write your own text if
+  you like.
+
+**Search engines (SEO)**
+- **Added to the end of page titles**, e.g. "| GECO Africa".
+- **Default sharing image**: used when a page has no image of its own (best size 1200 × 630).
+- **Google Search Console code** and **Bing Webmaster code**: paste the verification tag, and
+  only the code inside it is kept.
+- **Google Analytics ID** (starts with G-) to count visitors.
+- **Hide the whole website from search engines**: only for testing before launch. Leave it off
+  on the live site.
 
 Social media icons appear in the footer only for the links you fill in.
 
@@ -144,6 +215,11 @@ Social media icons appear in the footer only for the links you fill in.
 
 Every user can edit everything. In **Users** you can add a colleague, reset a password or
 deactivate someone who has left. You cannot deactivate yourself or the last active user.
+
+- When adding a colleague, leave **Email them a link to choose their own password** ticked. They
+  receive an email with a link (valid for 24 hours), so nobody else ever knows their password.
+- **Email reset link** sends someone a fresh link if they are locked out.
+- **Forgot your password?** on the sign-in page does the same for yourself.
 
 Use passwords of at least 12 characters, and never share an account.
 

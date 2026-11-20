@@ -13,4 +13,14 @@ class ContactMessage extends Model
         'service',
         'message',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'contacted_at' => 'datetime',
+            'closed_at' => 'datetime',
+            'notification_sent_at' => 'datetime',
+            'acknowledgement_sent_at' => 'datetime',
+        ];
+    }
 }

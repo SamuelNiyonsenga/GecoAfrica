@@ -62,7 +62,11 @@
                                     <p>{{ $project['areaNote'] }}</p>
                                 </details>
                             @endif
-                            <a class="featured-project-action" href="#project-references">Explore project references <span aria-hidden="true">↗</span></a>
+                            @if (!empty($project['slug']))
+                                <a class="featured-project-action" href="{{ route('projects.show', $project['slug']) }}">Read the project story <span aria-hidden="true">↗</span></a>
+                            @else
+                                <a class="featured-project-action" href="#project-references">Explore project references <span aria-hidden="true">↗</span></a>
+                            @endif
                         </div>
                     </article>
                 @endforeach
@@ -75,7 +79,7 @@
             <div class="section-heading">
                 <div>
                     <p class="eyebrow eyebrow-light"><span class="eyebrow-line"></span> Full project directory</p>
-                    <h2>49 references. <em>Three disciplines.</em></h2>
+                    <h2>{{ $referenceCount }} references. @php($groupCount = count($projectGroups))<em>{{ ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'][$groupCount] ?? $groupCount }} {{ \Illuminate\Support\Str::plural('discipline', $groupCount) }}.</em></h2>
                 </div>
                 <div class="project-directory-aside">
                     <p>Browse GECO Africa’s project references, or download the project reference list.</p>

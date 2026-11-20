@@ -31,7 +31,7 @@ class CmsPreviewController
         $view = match ($pageKey) {
             'home' => app(HomeController::class)->index(),
             'about' => app(AboutController::class)->index(),
-            'contact' => app(ContactController::class)->index(),
+            'contact' => app(ContactController::class)->index($request),
             'services' => app(ServicesController::class)->index(),
             'projects' => app(ProjectsController::class)->index(),
             'team' => app(TeamController::class)->index(),
@@ -52,11 +52,12 @@ class CmsPreviewController
 
         $view = match ($entry->type) {
             'blog_post' => app(BlogController::class)->show($entry->slug),
-            'service' => app(ServicesController::class)->index(),
+            'service' => app(ServicesController::class)->show($entry->slug),
             'team_member' => app(TeamController::class)->index(),
             'partner' => app(PartnersController::class)->index(),
             'gallery_item', 'gallery_category' => app(GalleryController::class)->index(),
-            'project_feature', 'project_group', 'project_reference' => app(ProjectsController::class)->index(),
+            'project_feature' => app(ProjectsController::class)->show($entry->slug),
+            'project_group', 'project_reference' => app(ProjectsController::class)->index(),
             'activity' => app(ActivitiesController::class)->index(),
             'blog_category' => app(BlogController::class)->index(request()),
             default => abort(404),

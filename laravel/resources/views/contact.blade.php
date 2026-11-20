@@ -48,7 +48,7 @@
                             <ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
                         </div>
                     @endif
-                    <form action="{{ route('contact.submit') }}" method="POST" class="contact-form">
+                    <form action="{{ route('contact.submit') }}" method="POST" class="contact-form" id="contact-form">
                         @csrf
                         <div class="contact-honeypot" aria-hidden="true">
                             <label for="company_website">Leave this field empty</label>
@@ -78,12 +78,9 @@
                                 <label for="contact-service">What can we help with?</label>
                                 <select id="contact-service" name="service" @error('service') aria-invalid="true" aria-describedby="service-error" @enderror>
                                     <option value="">Choose a service (optional)</option>
-                                    <option value="general" @selected(old('service') === 'general')>General enquiry</option>
-                                    <option value="geotechnical" @selected(old('service') === 'geotechnical')>Geotechnical investigation</option>
-                                    <option value="laboratory" @selected(old('service') === 'laboratory')>Laboratory testing</option>
-                                    <option value="roads" @selected(old('service') === 'roads')>Roads and transport</option>
-                                    <option value="design" @selected(old('service') === 'design')>Engineering design and supervision</option>
-                                    <option value="other" @selected(old('service') === 'other')>Other project or service</option>
+                                    @foreach ($serviceOptions as $optionValue => $optionLabel)
+                                        <option value="{{ $optionValue }}" @selected(old('service', $selectedService ?? '') === $optionValue)>{{ $optionLabel }}</option>
+                                    @endforeach
                                 </select>
                                 @error('service')<span class="contact-field-error" id="service-error">{{ $message }}</span>@enderror
                             </div>

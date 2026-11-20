@@ -37,7 +37,7 @@ class StructuredData
             'publisher' => ['@id' => $siteUrl.'/#organization'],
         ];
         if (! empty($page['ogImage'])) {
-            $pageSchema['image'] = $page['ogImage'];
+            $pageSchema['image'] = Seo::absoluteUrl($page['ogImage']);
         }
 
         return [
@@ -52,6 +52,8 @@ class StructuredData
                     'publisher' => ['@id' => $siteUrl.'/#organization'],
                 ],
                 $pageSchema,
+                // Extra nodes from detail pages: Article, Service, BreadcrumbList…
+                ...array_values(array_filter((array) ($page['schemaExtra'] ?? []), 'is_array')),
             ],
         ];
     }

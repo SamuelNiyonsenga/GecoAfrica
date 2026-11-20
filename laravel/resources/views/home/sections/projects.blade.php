@@ -14,7 +14,7 @@
             <div class="home-project-grid home-scroll-row" id="home-projects-row" data-home-scroll-row="projects" role="region" aria-label="Selected GECO Africa project references" tabindex="0">
                 @foreach ($featuredProjects as $project)
                     <article class="home-project-card" data-reveal>
-                        <a class="home-project-image" href="{{ route('projects') }}#project-references" aria-label="View GECO project references: {{ $project['title'] }}">
+                        <a class="home-project-image" href="{{ !empty($project['slug']) ? route('projects.show', $project['slug']) : route('projects').'#project-references' }}" aria-label="Read the project story: {{ $project['title'] }}">
                             <img src="{{ asset($project['image']) }}" width="1200" height="900" alt="{{ $project['imageAlt'] }}" loading="lazy" decoding="async">
                             <span>{{ $project['number'] }}</span>
                         </a>

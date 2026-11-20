@@ -23,7 +23,7 @@
                     <img src="{{ asset('images/home/fieldwork-drilling.webp') }}" width="1600" height="900" alt="GECO Africa field team conducting a geotechnical investigation in Rwanda" fetchpriority="high" decoding="async">
                     <div class="services-hero-overlay" aria-hidden="true"></div>
                     <div class="services-hero-caption"><span>Insight from the ground up</span><small>GECO Africa · Since 2007</small></div>
-                    <div class="services-hero-count"><strong>04</strong><span>Connected service areas</span></div>
+                    <div class="services-hero-count"><strong>{{ str_pad((string) count($services), 2, '0', STR_PAD_LEFT) }}</strong><span>Connected service areas</span></div>
                 </div>
             </div>
         </div>
@@ -63,7 +63,8 @@
                             </a>
                         @endif
 
-                            <a class="service-enquiry-link" href="mailto:{{ $sitePublicEmail }}?subject=Enquiry%20about%20{{ rawurlencode($service['title']) }}">Discuss this service <span aria-hidden="true">→</span></a>
+                        <a class="service-enquiry-link" href="{{ route('services.show', $service['slug']) }}">Read more about {{ \Illuminate\Support\Str::lower($service['title']) }} <span aria-hidden="true">→</span></a>
+                        <a class="service-enquiry-link" href="{{ route('contact', ['service' => $service['slug']]) }}#contact-form">Discuss this service <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </section>
@@ -93,7 +94,7 @@
             </div>
             <div class="services-contact-action">
                 <p>Share a little about your project and the technical support you need. Our team can help you identify a useful next step.</p>
-                <a class="button button-bright" href="mailto:{{ $sitePublicEmail }}?subject=Project%20enquiry">Enquire about our services <span aria-hidden="true">↗</span></a>
+                <a class="button button-bright" href="{{ route('contact') }}#contact-form">Enquire about our services <span aria-hidden="true">↗</span></a>
                 <a class="contact-phone" href="tel:{{ preg_replace('/[^0-9+]/', '', $sitePrimaryPhone) }}">Or call <strong>{{ $sitePrimaryPhone }}</strong></a>
                 <a class="services-about-link" href="{{ route('about') }}">Learn more about GECO Africa <span aria-hidden="true">→</span></a>
             </div>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Support\CmsContentRepository;
+use App\Support\RichText;
+use App\Support\Seo;
 use Illuminate\View\View;
 
 class ProjectsController extends Controller
@@ -38,6 +40,37 @@ class ProjectsController extends Controller
             'projectGroups' => $groups,
             'selectedExperience' => CmsContentRepository::selectedExperience(),
             'referenceCount' => CmsContentRepository::referenceCount(),
+        ]);
+    }
+
+    public function show(string $slug): View
+    {
+        $project = CmsContentRepository::findFeaturedProject($slug);
+        abort_if($project === null, 404);
+
+        $body = RichText::withHeadingAnchors((string) ($project['body'] ?? ''), 'project');
+        $url = route('projects.show', $project['slug']);
+        $seo = Seo::forItem($project, 'A GECO Africa engineering project in Rwanda.');
+        $others = array_values(array_filter(CmsContentRepository::featuredProjects(), static fn (array $item): bool => ($item['slug'] ?? '') !== $project['slug']));
+
+        return view('project-show', $seo + [
+            'cmsPageKey' => 'project',
+            'project' => $project,
+            'body' => $body['html'],
+            'toc' => $body['toc'],
+            'otherProjects' => array_slice($others, 0, 3),
+            'schemaExtra' => [
+                array_filter([
+                    '@type' => 'CreativeWork',
+                    'name' => $project['title'],
+                    'description' => $seo['pageDescription'],
+                    'url' => $url,
+                    'image' => $seo['ogImage'],
+                    'locationCreated' => ($project['location'] ?? '') !== '' ? ['@type' => 'Place', 'name' => $project['location']] : null,
+                    'creator' => ['@id' => rtrim((string) config('app.url'), '/').'/#organization'],
+                ]),
+                Seo::breadcrumbs([['Home', route('home')], ['Projects', route('projects')], [$project['title'], $url]]),
+            ],
         ]);
     }
 }
